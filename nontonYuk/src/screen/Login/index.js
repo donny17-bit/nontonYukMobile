@@ -19,9 +19,7 @@ function LoginScreen(props) {
   };
 
   const handleRegister = () => {
-    props.navigation.navigate('Register', {
-      screen: 'Register',
-    });
+    props.navigation.navigate('Register');
   };
 
   const [text, onChangeText] = React.useState(null);

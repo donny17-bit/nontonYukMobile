@@ -12,82 +12,26 @@ import {
 } from 'react-native';
 import {StyleSheet} from 'react-native';
 
-function HomeScreen(props) {
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
-
-  const [text, onChangeText] = React.useState(null);
-
-  const handleViewAll = () => {
-    props.navigation.navigate('ListMovie');
+function Profile(props) {
+  const handleDetail = () => {
+    props.navigation.navigate('DetailMovie');
   };
 
   return (
     <ScrollView>
-      <View style={styles.container}>
-        <Text style={{color: '#A0A3BD', paddingTop: 30, fontSize: 14}}>
-          Nearest Cinema, Newest Movie,
-        </Text>
-        <Text style={styles.title}>Find out now!</Text>
-      </View>
-      <View
-        style={{backgroundColor: 'white', paddingTop: 50, paddingBottom: 100}}>
-        <Image
-          style={{
-            height: 400,
-            width: windowWidth,
-          }}
-          source={require('../../assets/Group-13.png')}
-        />
-      </View>
-      <View style={styles.showing}>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Text
-            style={{
-              color: '#752EEA',
-              fontSize: 18,
-              fontWeight: '700',
-            }}>
-            Now Showing
-          </Text>
-          <TouchableOpacity onPress={handleViewAll}>
-            <Text
-              style={{
-                color: '#752EEA',
-                fontSize: 14,
-                fontWeight: '600',
-              }}>
-              view all
-            </Text>
-          </TouchableOpacity>
+      <View style={{padding: 20}}>
+        <View style={{paddingTop: 20}}>
+          <Text style={styles.title}>List Movie</Text>
         </View>
-        <View style={{flexDirection: 'row'}}>
-          <View style={styles.imageBorder}>
-            <Image source={require('../../assets/Rectangle-119.png')} />
-          </View>
-          <View style={styles.imageBorder}>
-            <Image source={require('../../assets/Rectangle-119.png')} />
-          </View>
-        </View>
-      </View>
-      <View style={styles.container}>
         <View
           style={{
-            paddingTop: 50,
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
+            paddingTop: 10,
           }}>
-          <Text style={{fontSize: 18, fontWeight: '700', color: 'black'}}>
-            Upcoming Movies
-          </Text>
-          <TouchableOpacity onPress={handleViewAll}>
-            <Text style={{fontSize: 14, fontWeight: '600', color: '#5F2EEA'}}>
-              view all
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{top: 20, flexDirection: 'row'}}>
-          <Button title="September" color="#5F2EEA" style={{flex: 2}} />
+          <Button title="september" color="#5F2EEA" />
+          <Button title="october" color="#5F2EEA" style={{flex: 1}} />
+          <Button title="december" color="#5F2EEA" style={{flex: 2}} />
         </View>
         <View style={{flexDirection: 'row', top: 60, paddingBottom: 100}}>
           <View style={styles.imageCard}>
@@ -111,7 +55,11 @@ function HomeScreen(props) {
               Action, Adventure, Sci-Fi
             </Text>
             <View style={{paddingTop: 20}}>
-              <Button title="Details" style={{borderColor: '#5F2EEA'}} />
+              <Button
+                title="Details"
+                style={{borderColor: '#5F2EEA'}}
+                onPress={handleDetail}
+              />
             </View>
           </View>
           <View style={styles.imageCard}>
@@ -135,37 +83,12 @@ function HomeScreen(props) {
               Action, Adventure, Sci-Fi
             </Text>
             <View style={{paddingTop: 20}}>
-              <Button title="Details" style={{borderColor: '#5F2EEA'}} />
+              <Button
+                title="Details"
+                style={{borderColor: '#5F2EEA'}}
+                onPress={handleDetail}
+              />
             </View>
-          </View>
-        </View>
-        <View style={{paddingTop: 100}}>
-          <View style={{justifyContent: 'center', flexDirection: 'row'}}>
-            <Text style={{color: '#4E4B66', fontSize: 14, fontWeight: '400'}}>
-              Be the vanguard of the
-            </Text>
-          </View>
-          <View style={{justifyContent: 'center', flexDirection: 'row'}}>
-            <Text style={{color: '#5F2EEA', fontSize: 32, fontWeight: '700'}}>
-              Moviegoers
-            </Text>
-          </View>
-          <SafeAreaView style={{paddingTop: 30}}>
-            <TextInput
-              style={styles.input}
-              // onChangeText={onChangeText}
-              value={text}
-            />
-          </SafeAreaView>
-          <View style={{paddingTop: 20}}>
-            <Button title="Join now" color="#5F2EEA" style={{flex: 1}} />
-          </View>
-          <View style={{alignItems: 'center', padding: 40}}>
-            <Text style={styles.commonText}>
-              By joining you as a Tickitz member,
-            </Text>
-            <Text style={styles.commonText}>we will always send you the</Text>
-            <Text style={styles.commonText}>latest updates via email .</Text>
           </View>
         </View>
       </View>
@@ -268,51 +191,25 @@ function HomeScreen(props) {
   );
 }
 
-export default HomeScreen;
+export default Profile;
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+  title: {
+    color: '#14142B',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  imageCard: {
+    padding: 10,
+    marginEnd: 20,
+    borderRadius: 6,
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
   footer: {
     padding: 20,
     paddingTop: 50,
     backgroundColor: '#FFFFFF',
-  },
-  title: {
-    color: '#752EEA',
-    fontSize: 34,
-    fontWeight: '700',
-  },
-  showing: {
-    backgroundColor: '#D6D8E7',
-    padding: 20,
-    paddingTop: 48,
-    paddingBottom: 70,
-  },
-  imageBorder: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'white',
-    borderRadius: 6,
-    top: 20,
-    width: 145,
-    marginEnd: 20,
-  },
-  imageCard: {
-    padding: 10,
-    marginEnd: 20,
-    borderWidth: 1,
-    borderColor: '#DEDEDE',
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  input: {
-    height: 64,
-    // margin: 20,
-    borderWidth: 1,
-    borderColor: '#DEDEDE',
   },
   commonText: {
     color: '#6E7191',
