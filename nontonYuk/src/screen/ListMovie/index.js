@@ -55,7 +55,7 @@ function Profile(props) {
 
   useEffect(() => {
     // default temporary
-    getMoviesByMonth('3');
+    getMoviesByMonth('5');
   }, []);
 
   return (
@@ -64,178 +64,74 @@ function Profile(props) {
         <View style={{paddingTop: 20}}>
           <Text style={styles.title}>List Movie</Text>
         </View>
+        <View style={styles.container}>
+          <FlatList
+            data={month}
+            horizontal={true}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => (
+              <View
+                style={{
+                  paddingTop: 20,
+                  flexDirection: 'row',
+                  marginEnd: 10,
+                }}>
+                <Button
+                  title={item.name}
+                  color="#5F2EEA"
+                  onPress={e => handleMonth(`${item.id}`)}
+                />
+              </View>
+            )}
+          />
+        </View>
+        {/* <View style={styles.container}> */}
         <FlatList
-          data={month}
-          horizontal={true}
+          style={{marginBottom: 300}}
+          numColumns={2}
+          data={data}
           keyExtractor={item => item.id}
           renderItem={({item}) => (
-            <View
-              style={{
-                paddingTop: 20,
-                flexDirection: 'row',
-                marginEnd: 10,
-              }}>
-              <Button
-                title={item.name}
-                color="#5F2EEA"
-                onPress={e => handleMonth(`${item.id}`)}
+            <View style={styles.imageCard}>
+              <Image
+                source={{
+                  uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${item.image}`,
+                }}
+                style={{
+                  width: 120,
+                  height: 180,
+                  resizeMode: 'cover',
+                }}
               />
+              <Text
+                style={{
+                  paddingTop: 10,
+                  color: 'black',
+                  fontSize: 14,
+                  fontWeight: '600',
+                }}>
+                {item.name}
+              </Text>
+              <Text
+                style={{
+                  paddingTop: 10,
+                  color: '#A0A3BD',
+                  fontSize: 11,
+                  fontWeight: '300',
+                }}>
+                {item.category}
+              </Text>
+              <View style={{paddingTop: 20}}>
+                <Button
+                  title="Details"
+                  style={{borderColor: '#5F2EEA'}}
+                  onPress={handleDetail}
+                />
+              </View>
             </View>
           )}
         />
-        <View style={{flexDirection: 'row', top: 60, paddingBottom: 100}}>
-          <View style={styles.imageCard}>
-            <Image source={require('../../assets/Rectangle-119.png')} />
-            <Text
-              style={{
-                paddingTop: 10,
-                color: 'black',
-                fontSize: 14,
-                fontWeight: '600',
-              }}>
-              Spider-man
-            </Text>
-            <Text
-              style={{
-                paddingTop: 10,
-                color: '#A0A3BD',
-                fontSize: 11,
-                fontWeight: '300',
-              }}>
-              Action, Adventure, Sci-Fi
-            </Text>
-            <View style={{paddingTop: 20}}>
-              <Button
-                title="Details"
-                style={{borderColor: '#5F2EEA'}}
-                onPress={handleDetail}
-              />
-            </View>
-          </View>
-          <View style={styles.imageCard}>
-            <Image source={require('../../assets/Rectangle-119.png')} />
-            <Text
-              style={{
-                paddingTop: 10,
-                color: 'black',
-                fontSize: 14,
-                fontWeight: '600',
-              }}>
-              Spider-man
-            </Text>
-            <Text
-              style={{
-                paddingTop: 10,
-                color: '#A0A3BD',
-                fontSize: 11,
-                fontWeight: '300',
-              }}>
-              Action, Adventure, Sci-Fi
-            </Text>
-            <View style={{paddingTop: 20}}>
-              <Button
-                title="Details"
-                style={{borderColor: '#5F2EEA'}}
-                onPress={handleDetail}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-      {/* footer */}
-      <View style={styles.footer}>
-        <Image source={require('../../assets/Tickitz-2.png')} />
-        <View style={{paddingTop: 20, paddingBottom: 40}}>
-          <Text style={styles.commonText}>
-            Stop waiting in line. Buy tickets
-          </Text>
-          <Text style={styles.commonText}>
-            conveniently, watch movies quietly.
-          </Text>
-        </View>
-        <Text style={{color: 'black', fontSize: 16, fontWeight: '600'}}>
-          Explore
-        </Text>
-        {/* link */}
-        <View style={{paddingTop: 20, flexDirection: 'row'}}>
-          <Text
-            style={{
-              flex: 1,
-              color: '#6E7191',
-              fontSize: 14,
-              fontWeight: '400',
-            }}>
-            Home
-          </Text>
-          <Text
-            style={{
-              flex: 2,
-              color: '#6E7191',
-              fontSize: 14,
-              fontWeight: '400',
-            }}>
-            List Movie
-          </Text>
-        </View>
-        <Text
-          style={{
-            paddingTop: 40,
-            color: 'black',
-            fontSize: 16,
-            fontWeight: '600',
-          }}>
-          Our Sponsor
-        </Text>
-        <View style={{flexDirection: 'row', paddingTop: 20}}>
-          <Image
-            source={require('../../assets/ebv.id.png')}
-            style={{marginRight: 20}}
-          />
-          <Image
-            source={require('../../assets/CineOne21.png')}
-            style={{marginRight: 20, marginTop: 10}}
-          />
-          <Image
-            source={require('../../assets/hiflix.png')}
-            style={{marginRight: 20}}
-          />
-        </View>
-        <Text
-          style={{
-            paddingTop: 50,
-            color: 'black',
-            fontSize: 16,
-            fontWeight: '600',
-          }}>
-          Follow us
-        </Text>
-        <View style={{paddingTop: 20, flexDirection: 'row'}}>
-          <Image
-            source={require('../../assets/facebook.png')}
-            style={{marginRight: 20}}
-          />
-          <Image
-            source={require('../../assets/instagram.png')}
-            style={{marginRight: 20}}
-          />
-          <Image
-            source={require('../../assets/twitter.png')}
-            style={{marginRight: 20}}
-          />
-          <Image
-            source={require('../../assets/youtube.png')}
-            style={{marginRight: 20}}
-          />
-        </View>
-        <Text
-          style={{
-            color: '#6E7191',
-            fontSize: 13,
-            fontWeight: '400',
-            paddingTop: 50,
-          }}>
-          © 2020 Tickitz. All Rights Reserved.
-        </Text>
+        {/* </View> */}
       </View>
     </View>
   );
@@ -244,6 +140,13 @@ function Profile(props) {
 export default Profile;
 
 const styles = StyleSheet.create({
+  container: {
+    // flexDirection: 'row',
+    // paddingTop: 20,
+    paddingBottom: 20,
+    // flexWrap: 'wrap',
+    // justifyContent: 'space-between',
+  },
   title: {
     color: '#14142B',
     fontSize: 18,
@@ -251,7 +154,8 @@ const styles = StyleSheet.create({
   },
   imageCard: {
     padding: 10,
-    marginEnd: 20,
+    marginEnd: 15,
+    marginBottom: 15,
     borderRadius: 6,
     alignItems: 'center',
     backgroundColor: 'white',

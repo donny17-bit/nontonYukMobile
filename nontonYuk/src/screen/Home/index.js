@@ -131,16 +131,42 @@ function HomeScreen(props) {
           style={{paddingBottom: 20}}
           renderItem={({item}) => (
             <View style={{flexDirection: 'row', paddingTop: 20}}>
-              <View style={styles.imageBorder}>
+              <View style={[styles.imageCard, {backgroundColor: 'white'}]}>
                 <Image
                   source={{
                     uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${item.image}`,
                   }}
                   style={{
-                    height: 200,
+                    width: 125,
+                    height: 180,
                     resizeMode: 'cover',
                   }}
                 />
+                <Text
+                  style={{
+                    paddingTop: 10,
+                    color: 'black',
+                    fontSize: 14,
+                    fontWeight: '600',
+                  }}>
+                  {item.name}
+                </Text>
+                <Text
+                  style={{
+                    paddingTop: 10,
+                    color: '#A0A3BD',
+                    fontSize: 11,
+                    fontWeight: '300',
+                  }}>
+                  {item.category}
+                </Text>
+                <View style={{paddingTop: 20}}>
+                  <Button
+                    title="Details"
+                    style={{borderColor: '#5F2EEA'}}
+                    onPress={handleDetail}
+                  />
+                </View>
               </View>
             </View>
           )}
@@ -195,7 +221,7 @@ function HomeScreen(props) {
                   }}
                   style={{
                     width: 125,
-                    height: 200,
+                    height: 180,
                     resizeMode: 'cover',
                   }}
                 />
@@ -378,7 +404,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D6D8E7',
     padding: 20,
     paddingTop: 48,
-    paddingBottom: 70,
+    paddingBottom: 40,
   },
   imageBorder: {
     padding: 10,
