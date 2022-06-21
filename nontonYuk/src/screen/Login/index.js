@@ -31,6 +31,7 @@ function LoginScreen(props) {
       await AsyncStorage.setItem('id', result.data.data.id);
       await AsyncStorage.setItem('token', result.data.data.token);
       await AsyncStorage.setItem('refreshToken', result.data.data.refreshToken);
+
       props.navigation.navigate('AppScreen', {
         screen: 'Home',
       });

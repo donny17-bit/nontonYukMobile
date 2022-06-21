@@ -19,11 +19,7 @@ function SplashScreen(props) {
     }, 1000);
   };
 
-  return (
-    <View>
-      <Text>Splash Screen</Text>
-    </View>
-  );
+  return <View />;
 }
 
 export default SplashScreen;

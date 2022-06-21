@@ -67,7 +67,7 @@ function ListMovieNavigator() {
         component={ListMovie}
         name="ListMovie"
         options={{
-          headerShown: true,
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

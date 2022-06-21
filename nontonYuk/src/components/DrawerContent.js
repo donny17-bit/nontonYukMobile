@@ -67,10 +67,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 3,
     fontWeight: 'bold',
+    color: 'black',
   },
   caption: {
     fontSize: 14,
     lineHeight: 14,
+    color: 'black',
   },
   containerSection: {
     marginBottom: 5,
