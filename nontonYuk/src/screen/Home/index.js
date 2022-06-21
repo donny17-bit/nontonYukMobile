@@ -66,8 +66,8 @@ function HomeScreen(props) {
     // };
   };
 
-  const handleDetail = () => {
-    props.navigation.navigate('DetailMovie');
+  const handleDetail = id => {
+    props.navigation.navigate('DetailMovie', {id: id});
   };
 
   const handleViewAll = () => {
@@ -164,7 +164,7 @@ function HomeScreen(props) {
                   <Button
                     title="Details"
                     style={{borderColor: '#5F2EEA'}}
-                    onPress={handleDetail}
+                    onPress={e => handleDetail(item.id)}
                   />
                 </View>
               </View>
@@ -247,7 +247,7 @@ function HomeScreen(props) {
                   <Button
                     title="Details"
                     style={{borderColor: '#5F2EEA'}}
-                    onPress={handleDetail}
+                    onPress={e => handleDetail(item.id)}
                   />
                 </View>
               </View>

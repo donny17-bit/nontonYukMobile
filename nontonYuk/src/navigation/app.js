@@ -20,7 +20,7 @@ function HomeNavigator() {
     <Stack.Navigator
       initialRouteName="Home"
       // screenOptions={({route}) => {
-      // console.log(route);
+      //   console.log(route);
       // }}
     >
       <Stack.Screen

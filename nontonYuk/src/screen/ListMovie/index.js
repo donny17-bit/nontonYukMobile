@@ -49,8 +49,8 @@ function Profile(props) {
     // };
   };
 
-  const handleDetail = () => {
-    props.navigation.navigate('DetailMovie');
+  const handleDetail = id => {
+    props.navigation.navigate('DetailMovie', {id: id});
   };
 
   useEffect(() => {
@@ -125,7 +125,7 @@ function Profile(props) {
                 <Button
                   title="Details"
                   style={{borderColor: '#5F2EEA'}}
-                  onPress={handleDetail}
+                  onPress={e => handleDetail(item.id)}
                 />
               </View>
             </View>

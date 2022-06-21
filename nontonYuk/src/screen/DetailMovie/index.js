@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -7,16 +7,35 @@ import {
   Text,
   View,
 } from 'react-native';
+import axios from '../../utils/axios';
 
-function DetailMovie() {
+function DetailMovie(props) {
   const windowWidth = Dimensions.get('window').width;
+  const {id} = props.route.params;
+  const [data, setData] = useState({});
+  const [releaseDate, setReleaseDate] = useState('');
+
+  const getMoviesById = async () => {
+    try {
+      const result = await axios.get(`movie/${id}`);
+      setData(result.data.data[0]);
+      setReleaseDate(result.data.data[0].releaseDate);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    // default temporary
+    getMoviesById();
+  }, []);
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <View
           style={{
-            paddingTop: 50,
+            paddingTop: 20,
             alignItems: 'center',
           }}>
           <View
@@ -32,26 +51,26 @@ function DetailMovie() {
                 height: 244,
                 resizeMode: 'contain',
               }}
-              source={require('../../assets/Rectangle-119.png')}
+              source={{
+                uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${data.image}`,
+              }}
             />
           </View>
-          <Text style={styles.title}>Spider-Man: Homecoming</Text>
-          <Text style={styles.genre}>Action, Adventure, Sci-fi</Text>
+          <Text style={styles.title}>{data.name}</Text>
+          <Text style={styles.genre}>{data.category}</Text>
         </View>
         <View style={{flexDirection: 'row', paddingTop: 30}}>
           <View style={{flex: 1}}>
             <Text style={styles.subtitle}>Release date</Text>
-            <Text style={styles.content}>June 28, 2017</Text>
+            <Text style={styles.content}>{releaseDate.slice(0, 10)}</Text>
             <Text style={styles.subtitle}>Duration</Text>
-            <Text style={styles.content}>2 hrs 13 min</Text>
+            <Text style={styles.content}>{data.duration}</Text>
           </View>
           <View style={{flex: 1}}>
             <Text style={styles.subtitle}>Directed by</Text>
-            <Text style={styles.content}>Jon Watss</Text>
+            <Text style={styles.content}>{data.director}</Text>
             <Text style={styles.subtitle}>Cast</Text>
-            <Text style={styles.content}>
-              Tom Holland, Robert Downey Jr., etc.
-            </Text>
+            <Text style={styles.content}>{data.cast}</Text>
           </View>
         </View>
         <View style={{borderBottomColor: '#D6D8E7', borderBottomWidth: 1}} />
@@ -66,13 +85,7 @@ function DetailMovie() {
             Synopsis
           </Text>
           <Text style={{fontWeight: '400', fontSize: 13, color: '#4E4B66'}}>
-            Thrilled by his experience with the Avengers, Peter returns home,
-            where he lives with his Aunt May, under the watchful eye of his new
-            mentor Tony Stark, Peter tries to fall back into his normal daily
-            routine - distracted by thoughts of proving himself to be more than
-            just your friendly neighborhood Spider-Man - but when the Vulture
-            emerges as a new villain, everything that Peter holds most important
-            will be threatened.
+            {data.synopsis}
           </Text>
         </View>
       </View>
