@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,30 +9,80 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Button,
+  FlatList,
 } from 'react-native';
 import {StyleSheet} from 'react-native';
+import axios from '../../utils/axios';
 
 function Profile(props) {
+  const [data, setData] = useState([]);
+  const month = [
+    {name: 'January', id: 1},
+    {name: 'February', id: 2},
+    {name: 'March', id: 3},
+    {name: 'April', id: 4},
+    {name: 'May', id: 5},
+    {name: 'June', id: 6},
+    {name: 'July', id: 7},
+    {name: 'August', id: 8},
+    {name: 'September', id: 9},
+    {name: 'October', id: 10},
+    {name: 'November', id: 11},
+    {name: 'December', id: 12},
+  ];
+
+  const getMoviesByMonth = async bulan => {
+    try {
+      const result = await axios.get(
+        `movie?searchRelease=${bulan}&limit=10&page=1`,
+      );
+      setData(result.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleMonth = bulan => {
+    getMoviesByMonth(bulan);
+    // const handleChangeForm = (text, name) => {
+    //   setForm({...form, [name]: text});
+    // };
+  };
+
   const handleDetail = () => {
     props.navigation.navigate('DetailMovie');
   };
 
+  useEffect(() => {
+    // default temporary
+    getMoviesByMonth('3');
+  }, []);
+
   return (
-    <ScrollView>
+    <View>
       <View style={{padding: 20}}>
         <View style={{paddingTop: 20}}>
           <Text style={styles.title}>List Movie</Text>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            paddingTop: 10,
-          }}>
-          <Button title="september" color="#5F2EEA" />
-          <Button title="october" color="#5F2EEA" style={{flex: 1}} />
-          <Button title="december" color="#5F2EEA" style={{flex: 2}} />
-        </View>
+        <FlatList
+          data={month}
+          horizontal={true}
+          keyExtractor={item => item.id}
+          renderItem={({item}) => (
+            <View
+              style={{
+                paddingTop: 20,
+                flexDirection: 'row',
+                marginEnd: 10,
+              }}>
+              <Button
+                title={item.name}
+                color="#5F2EEA"
+                onPress={e => handleMonth(`${item.id}`)}
+              />
+            </View>
+          )}
+        />
         <View style={{flexDirection: 'row', top: 60, paddingBottom: 100}}>
           <View style={styles.imageCard}>
             <Image source={require('../../assets/Rectangle-119.png')} />
@@ -187,7 +237,7 @@ function Profile(props) {
           © 2020 Tickitz. All Rights Reserved.
         </Text>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
