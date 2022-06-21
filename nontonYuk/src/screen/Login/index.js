@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,43 @@ import {
   Button,
 } from 'react-native';
 import styles from './style';
+import axios from '../../utils/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function LoginScreen(props) {
-  const handleLogin = () => {
-    props.navigation.navigate('AppScreen', {
-      screen: 'Home',
-    });
-  };
+  // const handleLogin = () => {
+  //   props.navigation.navigate('AppScreen', {
+  //     screen: 'Home',
+  //   });
+  // };
 
   const handleRegister = () => {
     props.navigation.navigate('Register');
   };
 
-  const [text, onChangeText] = React.useState(null);
+  const handleLogin = async () => {
+    try {
+      console.log(form);
+      const result = await axios.post('auth/login', form);
+      await AsyncStorage.setItem('id', result.data.data.id);
+      await AsyncStorage.setItem('token', result.data.data.token);
+      await AsyncStorage.setItem('refreshToken', result.data.data.refreshToken);
+      props.navigation.navigate('AppScreen', {
+        screen: 'Home',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+  });
+
+  const handleChangeForm = (text, name) => {
+    setForm({...form, [name]: text});
+  };
 
   return (
     <View>
@@ -67,9 +91,9 @@ function LoginScreen(props) {
           </View>
           <SafeAreaView>
             <TextInput
+              placeholder="Input your email ..."
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'email')}
             />
           </SafeAreaView>
           <View style={{left: 20, top: 10}}>
@@ -84,9 +108,9 @@ function LoginScreen(props) {
           </View>
           <SafeAreaView>
             <TextInput
+              placeholder="Input your password ..."
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'password')}
             />
           </SafeAreaView>
         </View>

@@ -2,11 +2,11 @@ import axios from 'axios';
 import {AsyncStorage} from '@react-native-async-storage/async-storage';
 
 const axiosApiInstances = axios.create({
-  baseURL: 'https://project-tickitz.herokuapp.com/',
+  baseURL: 'https://project-nontonyuk.herokuapp.com/',
 });
 
 // Add a request interceptor
-axios.interceptors.request.use(
+axiosApiInstances.interceptors.request.use(
   async function (config) {
     // Do something before request is sent
     const token = await AsyncStorage.getItem('token');
@@ -22,7 +22,7 @@ axios.interceptors.request.use(
 );
 
 // Add a response interceptor
-axios.interceptors.response.use(
+axiosApiInstances.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
@@ -55,3 +55,5 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export default axiosApiInstances;
