@@ -87,7 +87,7 @@ function Profile(props) {
         </View>
         {/* <View style={styles.container}> */}
         <FlatList
-          style={{marginBottom: 300}}
+          style={{marginBottom: 220}}
           numColumns={2}
           data={data}
           keyExtractor={item => item.id}

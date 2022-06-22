@@ -61,9 +61,6 @@ function HomeScreen(props) {
 
   const handleMonth = bulan => {
     getMoviesByMonth(bulan);
-    // const handleChangeForm = (text, name) => {
-    //   setForm({...form, [name]: text});
-    // };
   };
 
   const handleDetail = id => {

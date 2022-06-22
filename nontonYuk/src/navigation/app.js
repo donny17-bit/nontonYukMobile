@@ -10,6 +10,7 @@ import Home from '../screen/Home';
 import Profile from '../screen/Profile';
 import ListMovie from '../screen/ListMovie';
 import DetailMovie from '../screen/DetailMovie';
+import Payment from '../screen/Payment';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -40,6 +41,13 @@ function HomeNavigator() {
       <Stack.Screen
         component={DetailMovie}
         name="DetailMovie"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Payment}
+        name="Payment"
         options={{
           headerShown: false,
         }}

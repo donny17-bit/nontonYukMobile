@@ -1,102 +1,70 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Button,
-  Dimensions,
   Image,
   ScrollView,
-  StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import axios from '../../utils/axios';
+import {StyleSheet} from 'react-native';
 
-function DetailMovie(props) {
-  const windowWidth = Dimensions.get('window').width;
-  const {id} = props.route.params;
-  const [data, setData] = useState({});
-  const [releaseDate, setReleaseDate] = useState('');
+function Payment(props) {
+  const [text, onChangeText] = useState('haiiiaka');
 
-  const getMoviesById = async () => {
-    try {
-      const result = await axios.get(`movie/${id}`);
-      setData(result.data.data[0]);
-      setReleaseDate(result.data.data[0].releaseDate);
-    } catch (error) {
-      console.log(error);
-    }
+  const handlePay = () => {
+    console.log('hahahhah');
   };
-
-  const handlePayment = () => {
-    props.navigation.navigate('Payment');
-  };
-
-  useEffect(() => {
-    // default temporary
-    getMoviesById();
-  }, []);
 
   return (
     <ScrollView>
+      <View style={styles.header}>
+        <Text
+          style={{
+            color: '#AAAAAA',
+            fontSize: 16,
+            fontWeight: '400',
+          }}>
+          Total Payment
+        </Text>
+        <Text
+          style={{
+            color: '#14142B',
+            fontWeight: '600',
+            fontSize: 20,
+          }}>
+          Rp 300.000
+        </Text>
+      </View>
       <View style={styles.container}>
+        <Text style={styles.title}>Payment Method</Text>
         <View
           style={{
-            paddingTop: 20,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              padding: 20,
-              borderWidth: 1,
-              borderColor: '#DEDEDE',
-              borderRadius: 8,
-            }}>
-            <Image
-              style={{
-                width: windowWidth / 2,
-                height: 244,
-                resizeMode: 'cover',
-                borderRadius: 8,
-              }}
-              source={{
-                uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${data.image}`,
-              }}
-            />
-          </View>
-          <Text style={styles.title}>{data.name}</Text>
-          <Text style={styles.genre}>{data.category}</Text>
+            marginTop: 20,
+            height: 100,
+            borderRadius: 16,
+            backgroundColor: 'white',
+          }}
+        />
+        <Text style={[styles.title, {marginTop: 40}]}>Personal Info</Text>
+        <View style={styles.formContainer}>
+          <Text style={styles.formTitle}>Full Name</Text>
+          <TextInput style={styles.input} value={text} editable={false} />
+          <Text style={styles.formTitle}>Email</Text>
+          <TextInput style={styles.input} value={text} editable={false} />
+          <Text style={styles.formTitle}>Phone Number</Text>
+          <TextInput style={styles.input} value={text} editable={false} />
         </View>
-        <View style={{flexDirection: 'row', paddingTop: 30}}>
-          <View style={{flex: 1}}>
-            <Text style={styles.subtitle}>Release date</Text>
-            <Text style={styles.content}>{releaseDate.slice(0, 10)}</Text>
-            <Text style={styles.subtitle}>Duration</Text>
-            <Text style={styles.content}>{data.duration}</Text>
-          </View>
-          <View style={{flex: 1}}>
-            <Text style={styles.subtitle}>Directed by</Text>
-            <Text style={styles.content}>{data.director}</Text>
-            <Text style={styles.subtitle}>Cast</Text>
-            <Text style={styles.content}>{data.cast}</Text>
-          </View>
-        </View>
-        <View style={{borderBottomColor: '#D6D8E7', borderBottomWidth: 1}} />
-        <View style={{paddingTop: 30, paddingBottom: 30}}>
+        <TouchableOpacity onPress={handlePay} style={styles.button}>
           <Text
             style={{
-              paddingBottom: 20,
-              fontWeight: '600',
+              color: 'white',
               fontSize: 16,
-              color: '#14142B',
+              fontWeight: '700',
             }}>
-            Synopsis
+            Pay your order
           </Text>
-          <Text style={{fontWeight: '400', fontSize: 13, color: '#4E4B66'}}>
-            {data.synopsis}
-          </Text>
-        </View>
-        <View>
-          <Button title="Payment" onPress={handlePayment} />
-        </View>
+        </TouchableOpacity>
       </View>
       {/* footer */}
       <View style={styles.footer}>
@@ -197,44 +165,56 @@ function DetailMovie(props) {
   );
 }
 
-export default DetailMovie;
+export default Payment;
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+  commonText: {
+    color: '#6E7191',
+    fontSize: 12,
+    fontWeight: '400',
   },
   footer: {
     padding: 20,
     paddingTop: 50,
     backgroundColor: '#FFFFFF',
   },
-  title: {
-    paddingTop: 20,
-    color: 'black',
-    fontWeight: '600',
-    fontSize: 20,
+  button: {
+    backgroundColor: '#5F2EEA',
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 50,
+    paddingVertical: 15,
   },
-  genre: {
-    paddingTop: 20,
+  formContainer: {
+    marginTop: 20,
+    borderRadius: 16,
+    backgroundColor: 'white',
+    paddingTop: 30,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+  },
+  input: {
     color: '#4E4B66',
-    fontWeight: '400',
-    fontSize: 16,
+    height: 48,
+    borderColor: '#DEDEDE',
+    borderWidth: 1,
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 12,
   },
-  subtitle: {
-    color: '#8692A6',
-    fontWeight: '400',
-    fontSize: 13,
+  title: {color: '#14142B', fontSize: 18, fontWeight: '600'},
+  formTitle: {color: '#696F79', fontWeight: '400', fontSize: 14},
+  header: {
+    backgroundColor: '#ffff',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomEndRadius: 8,
+    borderBottomStartRadius: 8,
   },
-  content: {
-    color: '#121212',
-    fontWeight: '400',
-    fontSize: 16,
-    paddingBottom: 30,
-  },
-  commonText: {
-    color: '#6E7191',
-    fontSize: 12,
-    fontWeight: '400',
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
 });
