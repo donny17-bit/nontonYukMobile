@@ -11,6 +11,7 @@ import Profile from '../screen/Profile';
 import ListMovie from '../screen/ListMovie';
 import DetailMovie from '../screen/DetailMovie';
 import Payment from '../screen/Payment';
+import Order from '../screen/Order';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -48,6 +49,13 @@ function HomeNavigator() {
       <Stack.Screen
         component={Payment}
         name="Payment"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Order}
+        name="Order"
         options={{
           headerShown: false,
         }}

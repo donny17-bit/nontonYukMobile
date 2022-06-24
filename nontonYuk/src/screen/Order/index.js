@@ -1,102 +1,49 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Button,
-  Dimensions,
   Image,
   ScrollView,
-  StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import axios from '../../utils/axios';
+import {StyleSheet} from 'react-native';
 
-function DetailMovie(props) {
-  const windowWidth = Dimensions.get('window').width;
-  const {id} = props.route.params;
-  const [data, setData] = useState({});
-  const [releaseDate, setReleaseDate] = useState('');
+function Order(props) {
+  const [text, onChangeText] = useState('haiiiaka');
 
-  const getMoviesById = async () => {
-    try {
-      const result = await axios.get(`movie/${id}`);
-      setData(result.data.data[0]);
-      setReleaseDate(result.data.data[0].releaseDate);
-    } catch (error) {
-      console.log(error);
-    }
+  const handlePay = () => {
+    props.navigation.navigate('Payment');
   };
-
-  const handlePayment = () => {
-    props.navigation.navigate('Order');
-  };
-
-  useEffect(() => {
-    // default temporary
-    getMoviesById();
-  }, []);
 
   return (
     <ScrollView>
       <View style={styles.container}>
+        <Text style={styles.title}>Choose Your Seat</Text>
         <View
           style={{
-            paddingTop: 20,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              padding: 20,
-              borderWidth: 1,
-              borderColor: '#DEDEDE',
-              borderRadius: 8,
-            }}>
-            <Image
-              style={{
-                width: windowWidth / 2,
-                height: 244,
-                resizeMode: 'cover',
-                borderRadius: 8,
-              }}
-              source={{
-                uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${data.image}`,
-              }}
-            />
-          </View>
-          <Text style={styles.title}>{data.name}</Text>
-          <Text style={styles.genre}>{data.category}</Text>
+            marginTop: 20,
+            height: 100,
+            borderRadius: 16,
+            backgroundColor: 'white',
+          }}
+        />
+        <Text style={[styles.title, {marginTop: 40}]}>Order Info</Text>
+        <View style={styles.formContainerTop}>
+          <Text style={{fontSize: 24, fontWeight: '600', color: '#14142B'}}>
+            CineOne21 Cinema
+          </Text>
         </View>
-        <View style={{flexDirection: 'row', paddingTop: 30}}>
-          <View style={{flex: 1}}>
-            <Text style={styles.subtitle}>Release date</Text>
-            <Text style={styles.content}>{releaseDate.slice(0, 10)}</Text>
-            <Text style={styles.subtitle}>Duration</Text>
-            <Text style={styles.content}>{data.duration}</Text>
-          </View>
-          <View style={{flex: 1}}>
-            <Text style={styles.subtitle}>Directed by</Text>
-            <Text style={styles.content}>{data.director}</Text>
-            <Text style={styles.subtitle}>Cast</Text>
-            <Text style={styles.content}>{data.cast}</Text>
-          </View>
-        </View>
-        <View style={{borderBottomColor: '#D6D8E7', borderBottomWidth: 1}} />
-        <View style={{paddingTop: 30, paddingBottom: 30}}>
+        <TouchableOpacity onPress={handlePay} style={styles.button}>
           <Text
             style={{
-              paddingBottom: 20,
-              fontWeight: '600',
+              color: 'white',
               fontSize: 16,
-              color: '#14142B',
+              fontWeight: '700',
             }}>
-            Synopsis
+            Pay your order
           </Text>
-          <Text style={{fontWeight: '400', fontSize: 13, color: '#4E4B66'}}>
-            {data.synopsis}
-          </Text>
-        </View>
-        <View>
-          <Button title="Payment" onPress={handlePayment} />
-        </View>
+        </TouchableOpacity>
       </View>
       {/* footer */}
       <View style={styles.footer}>
@@ -197,44 +144,45 @@ function DetailMovie(props) {
   );
 }
 
-export default DetailMovie;
+export default Order;
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+  commonText: {
+    color: '#6E7191',
+    fontSize: 12,
+    fontWeight: '400',
   },
   footer: {
     padding: 20,
     paddingTop: 50,
     backgroundColor: '#FFFFFF',
   },
-  title: {
-    paddingTop: 20,
-    color: 'black',
-    fontWeight: '600',
-    fontSize: 20,
+  button: {
+    backgroundColor: '#5F2EEA',
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 50,
+    paddingVertical: 15,
   },
-  genre: {
-    paddingTop: 20,
-    color: '#4E4B66',
-    fontWeight: '400',
-    fontSize: 16,
+  formContainerTop: {
+    marginTop: 20,
+    borderRadius: 16,
+    backgroundColor: 'white',
+    paddingTop: 30,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
   },
-  subtitle: {
-    color: '#8692A6',
-    fontWeight: '400',
-    fontSize: 13,
+  formContainer: {
+    marginTop: 20,
+    borderRadius: 16,
+    backgroundColor: 'white',
+    paddingTop: 30,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
   },
-  content: {
-    color: '#121212',
-    fontWeight: '400',
-    fontSize: 16,
-    paddingBottom: 30,
-  },
-  commonText: {
-    color: '#6E7191',
-    fontSize: 12,
-    fontWeight: '400',
+  title: {color: '#14142B', fontSize: 18, fontWeight: '600'},
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
 });

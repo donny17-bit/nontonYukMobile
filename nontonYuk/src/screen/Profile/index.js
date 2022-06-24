@@ -1,4 +1,5 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -8,8 +9,79 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
+import axios from '../../utils/axios';
 
 function Profile(props) {
+  const [data, setData] = useState();
+  const [formInfo, setFormInfo] = useState({
+    firstName: '',
+    lastName: '',
+    noTelp: '',
+  });
+  const [formPass, setFormPass] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [image, setImage] = useState({
+    uri: 'https://cdn-icons.flaticon.com/png/512/1144/premium/1144709.png?token=exp=1655978291~hmac=238a0f3dd589e12f106cf1cf6f4a8b4d',
+  });
+
+  const handleDetailInfo = (text, name) => {
+    // console.log(formInfo.lastName);
+    console.log(text.nativeEvent.text);
+    // setFormInfo({...formInfo, [name]: text});
+  };
+
+  const handlePassword = (text, name) => {
+    setFormPass({...formPass, [name]: text});
+  };
+
+  const handleUpdateInfo = async () => {
+    try {
+      const id = await AsyncStorage.getItem('id');
+      const result = await axios.patch(`user/profile/${id}`, formInfo);
+      getUserId();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUserId = async () => {
+    try {
+      const id = await AsyncStorage.getItem('id');
+      const result = await axios.get(`user/${id}`);
+      setData(result.data.data[0]);
+      setImage({
+        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+      });
+      setFormInfo(result.data.data[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      alert('Logout');
+      await AsyncStorage.clear();
+      props.navigation.navigate('AuthScreen', {
+        screen: 'Login',
+      });
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    console.log('use effect jalan');
+    if (data) {
+      console.log('ada data');
+      // console.log(formInfo);
+      // setFormInfo(data);
+    } else {
+      console.log('data empty');
+      getUserId();
+    }
+  }, []);
+
   return (
     <ScrollView>
       <View style={styles.header}>
@@ -33,7 +105,7 @@ function Profile(props) {
       <View style={styles.container}>
         <View style={styles.infoContainerTop}>
           <Image
-            source={require('../../assets/Rectangle-119.png')}
+            source={image}
             style={{
               borderRadius: 136 / 2,
               height: 136,
@@ -49,7 +121,7 @@ function Profile(props) {
               color: '#14142B',
               marginTop: 30,
             }}>
-            Jonas El Rodriguez
+            {data ? `${data.firstName} ${data.lastName}` : ''}
           </Text>
           <Text
             style={{
@@ -59,11 +131,11 @@ function Profile(props) {
               marginTop: 10,
               marginBottom: 30,
             }}>
-            Moviegoers
+            {data ? data.noTelp : ''}
           </Text>
         </View>
         <View style={styles.infoContainerBottom}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleLogout}>
             <Text
               style={{
                 color: 'white',
@@ -85,14 +157,34 @@ function Profile(props) {
         </Text>
         <View style={styles.formContainer}>
           <Text style={styles.formHeader}>Details Information</Text>
-          <Text style={styles.formTitle}>Full Name</Text>
-          <TextInput style={styles.input} value={'Jonas'} />
+          <Text style={styles.formTitle}>First Name</Text>
+          <TextInput
+            style={styles.input}
+            value={formInfo.firstName}
+            onChange={text => handleDetailInfo(text, 'firstName')}
+          />
+          <Text style={styles.formTitle}>Last Name</Text>
+          <TextInput
+            style={styles.input}
+            value={formInfo.lastName}
+            onChange={text => handleDetailInfo(text, 'lastName')}
+          />
           <Text style={styles.formTitle}>Email</Text>
-          <TextInput style={styles.input} value={'Jonas'} />
+          <TextInput
+            style={styles.input}
+            value={formInfo.email}
+            onChange={text => handleDetailInfo(text, 'email')}
+          />
           <Text style={styles.formTitle}>Phone Number</Text>
-          <TextInput style={styles.input} value={'Jonas'} />
+          <TextInput
+            style={styles.input}
+            value={formInfo.noTelp}
+            onChange={text => handleDetailInfo(text, 'noTelp')}
+          />
         </View>
-        <TouchableOpacity style={styles.buttonUpdate}>
+        <TouchableOpacity
+          style={styles.buttonUpdate}
+          onPress={handleUpdateInfo}>
           <Text
             style={{
               color: 'white',
@@ -105,9 +197,15 @@ function Profile(props) {
         <View style={styles.formContainer}>
           <Text style={styles.formHeader}>Account and Privacy</Text>
           <Text style={styles.formTitle}>New Password</Text>
-          <TextInput style={styles.input} value={'Jonas'} />
+          <TextInput
+            style={styles.input}
+            onChange={text => handlePassword(text, 'newPassword')}
+          />
           <Text style={styles.formTitle}>Confirm</Text>
-          <TextInput style={styles.input} value={'Jonas'} />
+          <TextInput
+            style={styles.input}
+            onChange={text => handlePassword(text, 'confirmPassword')}
+          />
         </View>
         <TouchableOpacity style={styles.buttonUpdate}>
           <Text

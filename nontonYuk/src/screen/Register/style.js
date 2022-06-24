@@ -12,7 +12,8 @@ export default StyleSheet.create({
     margin: 20,
     borderWidth: 1,
     color: 'black',
-    // padding: 20,
+    paddingHorizontal: 20,
+    borderRadius: 8,
   },
   container2: {
     backgroundColor: 'red',

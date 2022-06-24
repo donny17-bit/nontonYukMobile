@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   Button,
 } from 'react-native';
 import styles from './style';
+import axios from '../../utils/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function RegisterScreen(props) {
   // const handleLogin = () => {
@@ -18,13 +20,37 @@ function RegisterScreen(props) {
   //   });
   // };
 
+  const handleRegister = async () => {
+    try {
+      console.log(form);
+      const result = await axios.post('auth/register', form);
+      console.log(result.data);
+      alert('Success register, please activate your email');
+      props.navigation.navigate('Login', {
+        screen: 'Login',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    noTelp: '',
+  });
+
+  const handleChangeForm = (text, name) => {
+    setForm({...form, [name]: text});
+  };
+
   const handleLogin = () => {
     props.navigation.navigate('Login', {
       screen: 'Login',
     });
   };
-
-  const [text, onChangeText] = React.useState(null);
 
   return (
     <View>
@@ -71,8 +97,9 @@ function RegisterScreen(props) {
           <SafeAreaView>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'firstName')}
+              placeholder="Input your first name ..."
+              placeholderTextColor={'grey'}
             />
           </SafeAreaView>
           <View style={{left: 20, top: 10}}>
@@ -88,8 +115,9 @@ function RegisterScreen(props) {
           <SafeAreaView>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'lastName')}
+              placeholder="Input your last name ..."
+              placeholderTextColor={'grey'}
             />
           </SafeAreaView>
           <View style={{left: 20, top: 10}}>
@@ -105,8 +133,9 @@ function RegisterScreen(props) {
           <SafeAreaView>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'noTelp')}
+              placeholder="Input your phone number ..."
+              placeholderTextColor={'grey'}
             />
           </SafeAreaView>
           <View style={{left: 20, top: 10}}>
@@ -122,8 +151,9 @@ function RegisterScreen(props) {
           <SafeAreaView>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'email')}
+              placeholder="Input your email ..."
+              placeholderTextColor={'grey'}
             />
           </SafeAreaView>
           <View style={{left: 20, top: 10}}>
@@ -139,13 +169,14 @@ function RegisterScreen(props) {
           <SafeAreaView>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={text => handleChangeForm(text, 'password')}
+              placeholder="Input your password ..."
+              placeholderTextColor={'grey'}
             />
           </SafeAreaView>
         </View>
         <View style={{padding: 20}}>
-          <Button title="Sign Up" color="#5F2EEA" onPress={handleLogin} />
+          <Button title="Sign Up" color="#5F2EEA" onPress={handleRegister} />
         </View>
         <View
           style={{

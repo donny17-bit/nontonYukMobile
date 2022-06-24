@@ -93,6 +93,7 @@ function LoginScreen(props) {
           <SafeAreaView>
             <TextInput
               placeholder="Input your email ..."
+              placeholderTextColor={'grey'}
               style={styles.input}
               onChangeText={text => handleChangeForm(text, 'email')}
             />
@@ -110,6 +111,7 @@ function LoginScreen(props) {
           <SafeAreaView>
             <TextInput
               placeholder="Input your password ..."
+              placeholderTextColor={'grey'}
               style={styles.input}
               onChangeText={text => handleChangeForm(text, 'password')}
             />
