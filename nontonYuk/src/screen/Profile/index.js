@@ -53,13 +53,15 @@ function Profile(props) {
   };
 
   const getUser = async () => {
-    const id = await AsyncStorage.getItem('id');
-    const result = await dispatch(getUserId(id));
-    console.log(result.value.data.data[0]);
+    console.log(user);
+    console.log(await AsyncStorage.getAllKeys());
+    // const id = await AsyncStorage.getItem('id');
+    // const result = await dispatch(getUserId(id));
+    // console.log(result.value.data.data[0]);
     // setImage({
     //         uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
     //       });
-    setFormInfo(result.value.data.data[0]);
+    // setFormInfo(result.value.data.data[0]);
   };
 
   // const getUserId = async () => {
