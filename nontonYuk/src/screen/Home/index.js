@@ -13,8 +13,14 @@ import {
 } from 'react-native';
 import {StyleSheet} from 'react-native';
 import axios from '../../utils/axios';
+import {useSelector, useDispatch} from 'react-redux';
+import {getUserId} from '../../stores/action/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function HomeScreen(props) {
+  const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
@@ -48,6 +54,12 @@ function HomeScreen(props) {
     }
   };
 
+  const getUser = async () => {
+    const id = await AsyncStorage.getItem('id');
+    const result = await dispatch(getUserId(id));
+    // console.log(result.value.data.data[0]);
+  };
+
   const getMoviesByMonth = async bulan => {
     try {
       const result = await axios.get(
@@ -73,12 +85,16 @@ function HomeScreen(props) {
 
   useEffect(() => {
     getMovies();
+    getUser();
     // default temporary
     getMoviesByMonth('3');
   }, []);
 
   return (
     <ScrollView>
+      <View>
+        <Button title="getUser" onPress={getUser} />
+      </View>
       <View style={styles.container}>
         <Text style={{color: '#A0A3BD', paddingTop: 30, fontSize: 14}}>
           Nearest Cinema, Newest Movie,

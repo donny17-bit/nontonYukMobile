@@ -8,10 +8,16 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  Button,
 } from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import {getUserId} from '../../stores/action/user';
 import axios from '../../utils/axios';
 
 function Profile(props) {
+  const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
   const [data, setData] = useState();
   const [formInfo, setFormInfo] = useState({
     firstName: '',
@@ -46,19 +52,29 @@ function Profile(props) {
     }
   };
 
-  const getUserId = async () => {
-    try {
-      const id = await AsyncStorage.getItem('id');
-      const result = await axios.get(`user/${id}`);
-      setData(result.data.data[0]);
-      setImage({
-        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
-      });
-      setFormInfo(result.data.data[0]);
-    } catch (error) {
-      console.log(error);
-    }
+  const getUser = async () => {
+    const id = await AsyncStorage.getItem('id');
+    const result = await dispatch(getUserId(id));
+    console.log(result.value.data.data[0]);
+    // setImage({
+    //         uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+    //       });
+    setFormInfo(result.value.data.data[0]);
   };
+
+  // const getUserId = async () => {
+  //   try {
+  //     const id = await AsyncStorage.getItem('id');
+  //     const result = await axios.get(`user/${id}`);
+  //     setData(result.data.data[0]);
+  //     setImage({
+  //       uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+  //     });
+  //     setFormInfo(result.data.data[0]);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleLogout = async () => {
     try {
@@ -78,12 +94,16 @@ function Profile(props) {
       // setFormInfo(data);
     } else {
       console.log('data empty');
-      getUserId();
+      getUser();
+      // getUserId();
     }
   }, []);
 
   return (
     <ScrollView>
+      <View>
+        <Button title="user" onPress={getUser} />
+      </View>
       <View style={styles.header}>
         <Text
           style={{
