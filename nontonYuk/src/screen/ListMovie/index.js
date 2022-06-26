@@ -12,7 +12,7 @@ import {
   FlatList,
 } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
-// import SelectDropdown from 'react-native-select-
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {StyleSheet} from 'react-native';
 import axios from '../../utils/axios';
 
@@ -85,16 +85,26 @@ function Profile(props) {
                 borderRadius: 16,
                 height: 37,
                 flex: 1,
-                marginLeft: 5,
+
+                paddingRight: 10,
               }}
-              buttonTextStyle={{color: '#4E4B66', fontSize: 16}}
+              buttonTextStyle={{
+                color: '#4E4B66',
+                fontSize: 16,
+                textAlign: 'left',
+              }}
               // rowStyle={{borderRadius: 16}}
               rowTextStyle={{color: '#4E4B66'}}
-              dropdownIconPosition="right"
-              // renderDropdownIcon={(selectedItem, index) => {
-              //   console.log(selectedItem, index);
-              // }}
-              // dropdownStyle={{backgroundColor: 'black'}}
+              dropdownIconPosition={'right'}
+              renderDropdownIcon={isOpened => {
+                return (
+                  <FontAwesome
+                    name={isOpened ? 'chevron-up' : 'chevron-down'}
+                    color={'#4E4B66'}
+                    size={13}
+                  />
+                );
+              }}
               data={countries}
               onSelect={(selectedItem, index) => {
                 console.log(selectedItem, index);
@@ -116,8 +126,8 @@ function Profile(props) {
                 {
                   flex: 2,
                   paddingHorizontal: 15,
-                  paddingTop: 10,
-                  paddingBottom: 10,
+                  paddingBottom: 8,
+                  marginLeft: 10,
                 },
               ]}
               placeholder={'Search movie name'}
