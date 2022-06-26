@@ -33,50 +33,77 @@ function Profile(props) {
   });
 
   const handleDetailInfo = (text, name) => {
-    // console.log(formInfo.lastName);
-    console.log(text.nativeEvent.text);
-    // setFormInfo({...formInfo, [name]: text});
+    console.log(text);
+    setFormInfo({...formInfo, [name]: text});
   };
 
   const handlePassword = (text, name) => {
+    console.log(text);
     setFormPass({...formPass, [name]: text});
   };
 
   const handleUpdateInfo = async () => {
     try {
       const id = await AsyncStorage.getItem('id');
-      const result = await axios.patch(`user/profile/${id}`, formInfo);
-      getUserId();
+      await axios.patch(`user/profile/${id}`, formInfo);
+      getUser();
+      resetForm();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getUser = async () => {
-    console.log(user);
-    console.log(await AsyncStorage.getAllKeys());
-    // const id = await AsyncStorage.getItem('id');
-    // const result = await dispatch(getUserId(id));
-    // console.log(result.value.data.data[0]);
-    // setImage({
-    //         uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
-    //       });
-    // setFormInfo(result.value.data.data[0]);
+  const handleUpdatePass = async () => {
+    try {
+      const id = await AsyncStorage.getItem('id');
+      console.log(id);
+      console.log(formPass);
+      const result = await axios.patch(`user/password/${id}`, formPass);
+      console.log(result.data);
+      resetForm();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  // const getUserId = async () => {
-  //   try {
-  //     const id = await AsyncStorage.getItem('id');
-  //     const result = await axios.get(`user/${id}`);
-  //     setData(result.data.data[0]);
-  //     setImage({
-  //       uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
-  //     });
-  //     setFormInfo(result.data.data[0]);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
+  const resetForm = () => {
+    setFormInfo({
+      firstName: '',
+      lastName: '',
+      noTelp: '',
+    });
+    setFormPass({
+      newPassword: '',
+      confirmPassword: '',
+    });
+  };
+
+  // const getUser = async () => {
+  // ambil dari redux belum jadi
+  //   console.log(user);
+  //   console.log(await AsyncStorage.getAllKeys());
+  //   console.log(await AsyncStorage.getItem('persist:root'));
+  //   // const id = await AsyncStorage.getItem('id');
+  //   // const result = await dispatch(getUserId(id));
+  //   // console.log(result.value.data.data[0]);
+  //   // setImage({
+  //   //         uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+  //   //       });
+  //   // setFormInfo(result.value.data.data[0]);
   // };
+
+  const getUser = async () => {
+    try {
+      const id = await AsyncStorage.getItem('id');
+      const result = await axios.get(`user/${id}`);
+      setData(result.data.data[0]);
+      setImage({
+        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -103,9 +130,9 @@ function Profile(props) {
 
   return (
     <ScrollView>
-      <View>
+      {/* <View>
         <Button title="user" onPress={getUser} />
-      </View>
+      </View> */}
       <View style={styles.header}>
         <Text
           style={{
@@ -183,25 +210,19 @@ function Profile(props) {
           <TextInput
             style={styles.input}
             value={formInfo.firstName}
-            onChange={text => handleDetailInfo(text, 'firstName')}
+            onChangeText={text => handleDetailInfo(text, 'firstName')}
           />
           <Text style={styles.formTitle}>Last Name</Text>
           <TextInput
             style={styles.input}
             value={formInfo.lastName}
-            onChange={text => handleDetailInfo(text, 'lastName')}
-          />
-          <Text style={styles.formTitle}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={formInfo.email}
-            onChange={text => handleDetailInfo(text, 'email')}
+            onChangeText={text => handleDetailInfo(text, 'lastName')}
           />
           <Text style={styles.formTitle}>Phone Number</Text>
           <TextInput
             style={styles.input}
             value={formInfo.noTelp}
-            onChange={text => handleDetailInfo(text, 'noTelp')}
+            onChangeText={text => handleDetailInfo(text, 'noTelp')}
           />
         </View>
         <TouchableOpacity
@@ -221,15 +242,19 @@ function Profile(props) {
           <Text style={styles.formTitle}>New Password</Text>
           <TextInput
             style={styles.input}
-            onChange={text => handlePassword(text, 'newPassword')}
+            value={formPass.newPassword}
+            onChangeText={text => handlePassword(text, 'newPassword')}
           />
           <Text style={styles.formTitle}>Confirm</Text>
           <TextInput
             style={styles.input}
-            onChange={text => handlePassword(text, 'confirmPassword')}
+            value={formPass.confirmPassword}
+            onChangeText={text => handlePassword(text, 'confirmPassword')}
           />
         </View>
-        <TouchableOpacity style={styles.buttonUpdate}>
+        <TouchableOpacity
+          style={styles.buttonUpdate}
+          onPress={handleUpdatePass}>
           <Text
             style={{
               color: 'white',

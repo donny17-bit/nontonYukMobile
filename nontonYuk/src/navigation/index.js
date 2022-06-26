@@ -18,7 +18,7 @@ export default function MainStackNavigator() {
           component={SplashScreen}
           name="SplashScreen"
           options={{
-            headerShown: true,
+            headerShown: false,
           }}
         />
         <Stack.Screen
