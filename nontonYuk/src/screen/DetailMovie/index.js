@@ -188,7 +188,69 @@ function DetailMovie(props) {
           }}
         />
         <View style={styles.card}>
-          <Image source={require('../../assets/Tickitz-2.png')} />
+          <View
+            style={{
+              alignItems: 'center',
+              borderBottomColor: '#DEDEDE',
+              borderBottomWidth: 1,
+              paddingBottom: 20,
+            }}>
+            <Image source={require('../../assets/ebv.id.png')} />
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: '300',
+                color: '#AAAAAA',
+                marginTop: 10,
+              }}>
+              Whatever street No.12, South Purwokerto
+            </Text>
+          </View>
+          <View style={{marginVertical: 10}}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: '400',
+                color: '#4E4B66',
+                // marginTop: 10,
+              }}>
+              08:30pm
+            </Text>
+          </View>
+          <View
+            style={{
+              marginVertical: 20,
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '400',
+                color: '#6B6B6B',
+              }}>
+              Price
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '600',
+                color: 'black',
+              }}>
+              $10.00/seat
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#5F2EEA',
+              alignItems: 'center',
+              borderRadius: 4,
+              padding: 10,
+            }}>
+            <Text style={{fontSize: 14, fontWeight: '700', color: '#F7F7FC'}}>
+              Book Now
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
       {/* footer */}
@@ -298,10 +360,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 30,
     marginBottom: 20,
+    padding: 30,
   },
   containerSchedule: {
     padding: 20,
-    height: 300,
     backgroundColor: '#F5F6F8',
   },
   container: {
