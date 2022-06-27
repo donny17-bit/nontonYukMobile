@@ -7,12 +7,29 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity,
 } from 'react-native';
+import SelectDropdown from 'react-native-select-dropdown';
+import Icon from 'react-native-vector-icons/Feather';
+import DatePicker from 'react-native-date-picker';
 import axios from '../../utils/axios';
 
 function DetailMovie(props) {
+  const [date, setDate] = useState(new Date());
+  const [dateShow, setDateShow] = useState('Set a date');
+  const [open, setOpen] = useState(false);
   const windowWidth = Dimensions.get('window').width;
+  const cities = [
+    'bandung',
+    'jakarta',
+    'yogyakarta',
+    'surabaya',
+    'balikpapan',
+    'bali',
+  ];
+  const [selectedCity, setSelectedCity] = useState('Set a city');
   const {id} = props.route.params;
+  console.log(id);
   const [data, setData] = useState({});
   const [releaseDate, setReleaseDate] = useState('');
 
@@ -96,6 +113,82 @@ function DetailMovie(props) {
         </View>
         <View>
           <Button title="Payment" onPress={handlePayment} />
+        </View>
+      </View>
+      <View style={styles.containerSchedule}>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '700',
+            color: 'black',
+            alignSelf: 'center',
+            marginTop: 20,
+          }}>
+          Showtime and Tickets
+        </Text>
+        <TouchableOpacity onPress={() => setOpen(true)} style={styles.dropdown}>
+          <Icon name="calendar" size={20} color="#4E4B66" />
+          <Text
+            style={{
+              color: '#4E4B66',
+              fontSize: 14,
+              fontWeight: '600',
+              flex: 2,
+              marginStart: 10,
+            }}>
+            {dateShow}
+          </Text>
+          <Icon name="chevron-down" size={20} color="#4E4B66" />
+        </TouchableOpacity>
+        <DatePicker
+          modal
+          mode={'date'}
+          open={open}
+          date={date}
+          onConfirm={date => {
+            setOpen(false);
+            setDate(date);
+            setDateShow(
+              `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`,
+            );
+          }}
+          onCancel={() => {
+            setOpen(false);
+          }}
+        />
+        <SelectDropdown
+          buttonStyle={styles.dropdown}
+          rowTextStyle={{color: '#4E4B66'}}
+          renderCustomizedButtonChild={(selectedItem, index) => {
+            return (
+              <View style={{flexDirection: 'row'}}>
+                <Icon name="map-pin" color={'#4E4B66'} size={20} />
+                <Text
+                  style={{
+                    color: '#4E4B66',
+                    fontSize: 14,
+                    fontWeight: '600',
+                    textAlign: 'left',
+                    marginStart: 10,
+                    flex: 2,
+                  }}>
+                  {selectedItem ? selectedItem : 'Set a city'}
+                </Text>
+                <Icon name={'chevron-down'} color={'#4E4B66'} size={20} />
+              </View>
+            );
+          }}
+          data={cities}
+          onSelect={(selectedItem, index) => {
+            setSelectedCity(selectedItem);
+            console.log(selectedItem, index);
+          }}
+          rowTextForSelection={(item, index) => {
+            return item;
+          }}
+        />
+        <View style={styles.card}>
+          <Image source={require('../../assets/Tickitz-2.png')} />
         </View>
       </View>
       {/* footer */}
@@ -200,6 +293,17 @@ function DetailMovie(props) {
 export default DetailMovie;
 
 const styles = StyleSheet.create({
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  containerSchedule: {
+    padding: 20,
+    height: 300,
+    backgroundColor: '#F5F6F8',
+  },
   container: {
     padding: 20,
     backgroundColor: '#FFFFFF',
@@ -236,5 +340,16 @@ const styles = StyleSheet.create({
     color: '#6E7191',
     fontSize: 12,
     fontWeight: '400',
+  },
+  dropdown: {
+    padding: 10,
+    paddingTop: 13,
+    marginTop: 20,
+    backgroundColor: '#EFF0F6',
+    width: '80%',
+    height: 48,
+    borderRadius: 4,
+    alignSelf: 'center',
+    flexDirection: 'row',
   },
 });

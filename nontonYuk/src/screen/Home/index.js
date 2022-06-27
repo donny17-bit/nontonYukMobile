@@ -92,9 +92,9 @@ function HomeScreen(props) {
 
   return (
     <ScrollView>
-      <View>
+      {/* <View>
         <Button title="getUser" onPress={getUser} />
-      </View>
+      </View> */}
       <View style={styles.container}>
         <Text style={{color: '#A0A3BD', paddingTop: 30, fontSize: 14}}>
           Nearest Cinema, Newest Movie,
