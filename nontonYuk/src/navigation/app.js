@@ -13,6 +13,7 @@ import DetailMovie from '../screen/DetailMovie';
 import Payment from '../screen/Payment';
 import Order from '../screen/Order';
 import Midtrans from '../screen/Midtrans';
+import Ticket from '../screen/Ticket';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -78,6 +79,11 @@ function ProfileNavigator() {
       <Stack.Screen
         component={Profile}
         name="Profile"
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        component={Ticket}
+        name="Ticket"
         options={{headerShown: false}}
       />
     </Stack.Navigator>

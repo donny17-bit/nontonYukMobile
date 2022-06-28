@@ -1,16 +1,35 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItem,
   DrawerItemList,
 } from '@react-navigation/drawer';
-
 import Icon from 'react-native-vector-icons/Feather';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from '../utils/axios';
 
 function DrawerContent(props) {
+  const [data, setData] = useState({});
+  const [image, setImage] = useState({
+    uri: 'https://cdn-icons.flaticon.com/png/512/1144/premium/1144709.png?token=exp=1655978291~hmac=238a0f3dd589e12f106cf1cf6f4a8b4d',
+  });
+
+  const getUser = async () => {
+    try {
+      const id = await AsyncStorage.getItem('id');
+      console.log(id);
+      const result = await axios.get(`user/${id}`);
+      setData(result.data.data[0]);
+      console.log(result.data.data[0]);
+      setImage({
+        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       alert('Logout');
@@ -20,13 +39,33 @@ function DrawerContent(props) {
       });
     } catch (error) {}
   };
+
+  useEffect(() => {
+    console.log('use effect jalan');
+    if (data) {
+      console.log('ada data');
+    } else {
+      console.log('data empty');
+      getUser();
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       <DrawerContentScrollView {...props}>
         <View style={styles.containerProfile}>
-          <View style={styles.avatar} />
+          <View style={styles.avatar}>
+            <Image
+              style={{
+                width: 40,
+                resizeMode: 'cover',
+                borderRadius: 8,
+              }}
+              source={image}
+            />
+          </View>
           <View style={styles.biodata}>
-            <Text style={styles.title}>Anonymous</Text>
+            <Text style={styles.title}>{data.firstName}</Text>
             <Text style={styles.caption}>@bagustea</Text>
           </View>
         </View>
