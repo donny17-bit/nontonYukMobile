@@ -12,6 +12,7 @@ import ListMovie from '../screen/ListMovie';
 import DetailMovie from '../screen/DetailMovie';
 import Payment from '../screen/Payment';
 import Order from '../screen/Order';
+import Midtrans from '../screen/Midtrans';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -56,6 +57,13 @@ function HomeNavigator() {
       <Stack.Screen
         component={Order}
         name="Order"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Midtrans}
+        name="Midtrans"
         options={{
           headerShown: false,
         }}
