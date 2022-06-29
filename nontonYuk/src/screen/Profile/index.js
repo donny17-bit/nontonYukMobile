@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+// import modal
+import Modal from 'react-native-modal';
 import {useSelector, useDispatch} from 'react-redux';
 import {getUserId} from '../../stores/action/user';
 import axios from '../../utils/axios';
@@ -20,6 +23,7 @@ function Profile(props) {
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
 
+  const [isModalVisible, setModalVisible] = useState(false);
   const [activeMenu, setActiveMenu] = useState('profile');
   const [data, setData] = useState();
   const [booking, setBooking] = useState({
@@ -27,7 +31,7 @@ function Profile(props) {
   });
   const [schedule, setSchedule] = useState({1: ''});
   const [movie, setMovie] = useState({});
-  const [countMovie, setCountMovie] = useState([]);
+  const [imgClicked, setImgClicked] = useState(false);
   const [formInfo, setFormInfo] = useState({
     firstName: '',
     lastName: '',
@@ -170,6 +174,20 @@ function Profile(props) {
     });
   };
 
+  const handleOpenCamera = async () => {
+    const result = await launchCamera({mediaType: 'photo'});
+    console.log(result);
+  };
+
+  const handleOpenGalery = async () => {
+    const result = await launchImageLibrary({mediaType: 'photo'});
+    console.log(result);
+  };
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   useEffect(() => {
     console.log('use effect jalan');
     getUser();
@@ -181,16 +199,79 @@ function Profile(props) {
   const profileActive = (
     <View style={styles.container}>
       <View style={styles.infoContainerTop}>
-        <Image
-          source={image}
-          style={{
-            borderRadius: 136 / 2,
-            height: 136,
-            width: 136,
-            resizeMode: 'cover',
-            marginTop: 30,
-          }}
-        />
+        <TouchableOpacity onPress={() => setImgClicked(true)}>
+          <Image
+            source={image}
+            style={{
+              borderRadius: 136 / 2,
+              height: 136,
+              width: 136,
+              resizeMode: 'cover',
+              marginTop: 30,
+            }}
+          />
+        </TouchableOpacity>
+        {imgClicked ? (
+          <View>
+            <TouchableOpacity
+              onPress={toggleModal}
+              style={[styles.button, {marginVertical: 10}]}>
+              <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                Change Image
+              </Text>
+            </TouchableOpacity>
+            <Modal isVisible={isModalVisible} style={styles.view}>
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  padding: 20,
+                  alignItems: 'center',
+                  borderTopLeftRadius: 16,
+                  borderTopRightRadius: 16,
+                }}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleOpenGalery}>
+                  <Text
+                    style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                    Open Galery
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, {marginVertical: 20}]}
+                  onPress={handleOpenCamera}>
+                  <Text
+                    style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                    Open Camera
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, {backgroundColor: 'red'}]}
+                  onPress={toggleModal}>
+                  <Text
+                    style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+            <TouchableOpacity
+              onPress={() => setImgClicked(false)}
+              style={[
+                styles.button,
+                {
+                  marginBottom: 20,
+                  backgroundColor: 'red',
+                },
+              ]}>
+              <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <></>
+        )}
         <Text
           style={{
             fontSize: 20,
@@ -605,5 +686,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     padding: 10,
+  },
+  view: {
+    justifyContent: 'flex-end',
+    margin: 0,
   },
 });
