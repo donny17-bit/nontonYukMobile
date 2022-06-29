@@ -44,6 +44,7 @@ function DrawerContent(props) {
 
   useEffect(() => {
     if (!data) {
+      console.log('get user data');
       // get user data
       getUser();
     } else {

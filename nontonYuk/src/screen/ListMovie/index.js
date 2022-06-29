@@ -10,13 +10,22 @@ import {
   TouchableOpacity,
   Button,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {StyleSheet} from 'react-native';
+import stylesHome from '../Home/style';
 import axios from '../../utils/axios';
 
 function Profile(props) {
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(10);
+  const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [last, setLast] = useState(false);
+  const [loadMore, setLoadMore] = useState(false);
+
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [sort, setSort] = useState('ASC');
   const [searchName, setSearchName] = useState('');
@@ -37,14 +46,61 @@ function Profile(props) {
   ];
   const sorting = ['A - Z', 'Z - A'];
 
-  const getMovies = async (sort, searchName, currentMonth) => {
+  const getMovies = async (page, sort, searchName, currentMonth) => {
     try {
-      const result = await axios.get(
-        `movie?sort=${sort}&searchName=${searchName}&limit=10&searchRelease=${currentMonth}`,
-      );
-      setData(result.data.data);
+      setRefresh(false);
+      setLoading(false);
+      setLoadMore(false);
+      console.log('page : ' + page);
+      console.log('sort : ' + sort);
+      console.log('name : ' + searchName);
+      console.log('month : ' + currentMonth);
+      console.log('totalPage : ' + totalPage);
+      if (page <= totalPage) {
+        console.log('get user pending');
+        const result = await axios.get(
+          `movie?page=${page}&sort=${sort}&searchName=${searchName}&limit=5&searchRelease=${currentMonth}`,
+        );
+        if (page === 1) {
+          console.log('get user success page 1');
+          setData(result.data.data);
+        } else {
+          console.log('get data success page 2 ');
+          setData([...data, ...result.data.data]);
+        }
+        setTotalPage(result.data.pagination.totalPage);
+      } else {
+        setLast(true);
+      }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleRefresh = () => {
+    console.log('REFRESH SCREEN');
+    setPage(1);
+    setLast(false);
+    if (page !== 1) {
+      setRefresh(true);
+    } else {
+      getMovies(1, sort, searchName, currentMonth);
+    }
+  };
+
+  const handleLoadMore = () => {
+    console.log('LOAD MORE DATA');
+    if (!loadMore) {
+      const newPage = page + 1;
+      setLoadMore(true);
+      if (newPage <= totalPage + 1) {
+        setLoading(true);
+        setPage(newPage);
+        getMovies(newPage, sort, searchName, currentMonth);
+      } else {
+        setLoading(false);
+        getMovies(newPage, sort, searchName, currentMonth);
+      }
     }
   };
 
@@ -52,23 +108,27 @@ function Profile(props) {
     console.log(index);
     if (index == 0) {
       setSort('ASC');
-      getMovies('ASC', searchName, currentMonth);
+      getMovies(page, 'ASC', searchName, currentMonth);
     } else {
       setSort('DESC');
-      getMovies('DESC', searchName, currentMonth);
+      getMovies(page, 'DESC', searchName, currentMonth);
     }
   };
 
   const handleSearch = event => {
     const name = event.nativeEvent.text;
+    setPage(1);
     console.log(name);
     setSearchName(name);
-    getMovies(sort, name, currentMonth);
+    getMovies(1, sort, name, currentMonth);
   };
 
   const handleMonth = bulan => {
+    setPage(1);
+    console.log(page);
+    console.log(bulan);
     setCurrentMonth(bulan);
-    getMovies(sort, searchName, bulan);
+    getMovies(1, sort, searchName, bulan);
   };
 
   const handleDetail = id => {
@@ -76,12 +136,20 @@ function Profile(props) {
   };
 
   useEffect(() => {
-    getMovies(sort, searchName, currentMonth);
+    getMovies(page, sort, searchName, currentMonth);
   }, []);
+
+  // useEffect(() => {
+  //   console.log('use effect 2 jalan ');
+  //   setTimeout(() => {
+  //     getMovies(page, sort, searchName, currentMonth);
+  //   }, 2000);
+  // }, [page]);
 
   return (
     <SafeAreaView>
       <FlatList
+        refreshing
         data={['1']}
         renderItem={({item}) => (
           <View>
@@ -139,8 +207,6 @@ function Profile(props) {
                     placeholder={'Search movie name'}
                     placeholderTextColor={'#4E4B66'}
                     onSubmitEditing={event => handleSearch(event)}
-                    // value={formInfo.firstName}
-                    // onChangeText={text => handleDetailInfo(text, 'firstName')}
                   />
                 </View>
                 <FlatList
@@ -154,19 +220,51 @@ function Profile(props) {
                         flexDirection: 'row',
                         marginEnd: 10,
                       }}>
-                      <Button
+                      <TouchableOpacity
+                        style={[
+                          stylesHome.detailBtn,
+                          {backgroundColor: '#5F2EEA'},
+                        ]}
+                        onPress={e => handleMonth(`${item.id}`)}>
+                        <Text
+                          style={[
+                            stylesHome.detailsPress,
+                            {fontSize: 15, fontWeight: '500'},
+                          ]}>
+                          {item.name}
+                        </Text>
+                      </TouchableOpacity>
+                      {/* <Button
                         title={item.name}
                         color="#5F2EEA"
                         onPress={e => handleMonth(`${item.id}`)}
-                      />
+                      /> */}
                     </View>
                   )}
                 />
               </View>
-              {/* <View style={styles.container}> */}
               <FlatList
-                // style={{marginBottom: 220}}
-                numColumns={2}
+                ListFooterComponent={() =>
+                  last ? (
+                    <View>
+                      <Text style={{color: 'blue', alignSelf: 'center'}}>
+                        --end of data--
+                      </Text>
+                      {/* <Footer /> */}
+                    </View>
+                  ) : loading ? (
+                    <ActivityIndicator size="large" color="blue" />
+                  ) : null
+                }
+                onRefresh={handleRefresh}
+                refreshing={refresh}
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={0.1}
+                columnWrapperStyle={{
+                  flexWrap: 'wrap',
+                  flexDirection: 'row',
+                }}
+                numColumns={6}
                 data={data}
                 keyExtractor={item => item.id}
                 renderItem={({item}) => (
@@ -200,11 +298,16 @@ function Profile(props) {
                       {item.category}
                     </Text>
                     <View style={{paddingTop: 20}}>
-                      <Button
+                      <TouchableOpacity
+                        onPress={e => handleDetail(item.id)}
+                        style={stylesHome.detailBtn}>
+                        <Text style={stylesHome.details}>Details</Text>
+                      </TouchableOpacity>
+                      {/* <Button
                         title="Details"
                         style={{borderColor: '#5F2EEA'}}
                         onPress={e => handleDetail(item.id)}
-                      />
+                      /> */}
                     </View>
                   </View>
                 )}

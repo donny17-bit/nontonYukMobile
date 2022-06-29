@@ -11,7 +11,7 @@ import {
   Button,
   FlatList,
 } from 'react-native';
-import {StyleSheet} from 'react-native';
+import styles from './style';
 import axios from '../../utils/axios';
 import {useSelector, useDispatch} from 'react-redux';
 import {getUserId} from '../../stores/action/user';
@@ -92,9 +92,6 @@ function HomeScreen(props) {
 
   return (
     <ScrollView>
-      {/* <View>
-        <Button title="getUser" onPress={getUser} />
-      </View> */}
       <View style={styles.container}>
         <Text style={{color: '#A0A3BD', paddingTop: 30, fontSize: 14}}>
           Nearest Cinema, Newest Movie,
@@ -174,11 +171,11 @@ function HomeScreen(props) {
                   {item.category}
                 </Text>
                 <View style={{paddingTop: 20}}>
-                  <Button
-                    title="Details"
-                    style={{borderColor: '#5F2EEA'}}
+                  <TouchableOpacity
                     onPress={e => handleDetail(item.id)}
-                  />
+                    style={styles.detailBtn}>
+                    <Text style={styles.details}>Details</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -212,11 +209,17 @@ function HomeScreen(props) {
                 flexDirection: 'row',
                 marginEnd: 10,
               }}>
-              <Button
-                title={item.name}
-                color="#5F2EEA"
-                onPress={e => handleMonth(`${item.id}`)}
-              />
+              <TouchableOpacity
+                style={[styles.detailBtn, {backgroundColor: '#5F2EEA'}]}
+                onPress={e => handleMonth(`${item.id}`)}>
+                <Text
+                  style={[
+                    styles.detailsPress,
+                    {fontSize: 15, fontWeight: '500'},
+                  ]}>
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -257,11 +260,11 @@ function HomeScreen(props) {
                   {item.category}
                 </Text>
                 <View style={{paddingTop: 20}}>
-                  <Button
-                    title="Details"
-                    style={{borderColor: '#5F2EEA'}}
+                  <TouchableOpacity
                     onPress={e => handleDetail(item.id)}
-                  />
+                    style={styles.detailBtn}>
+                    <Text style={styles.details}>Details</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             )}
@@ -397,53 +400,3 @@ function HomeScreen(props) {
 }
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-  },
-  footer: {
-    padding: 20,
-    paddingTop: 50,
-    backgroundColor: '#FFFFFF',
-  },
-  title: {
-    color: '#752EEA',
-    fontSize: 34,
-    fontWeight: '700',
-  },
-  showing: {
-    backgroundColor: '#D6D8E7',
-    padding: 20,
-    paddingTop: 48,
-    paddingBottom: 40,
-  },
-  imageBorder: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'white',
-    borderRadius: 6,
-    width: 145,
-    marginEnd: 20,
-  },
-  imageCard: {
-    padding: 10,
-    marginEnd: 20,
-    borderWidth: 1,
-    borderColor: '#DEDEDE',
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  input: {
-    height: 64,
-    // margin: 20,
-    borderWidth: 1,
-    borderColor: '#DEDEDE',
-  },
-  commonText: {
-    color: '#6E7191',
-    fontSize: 12,
-    fontWeight: '400',
-  },
-});
