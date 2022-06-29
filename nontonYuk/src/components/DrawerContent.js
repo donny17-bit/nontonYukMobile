@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../utils/axios';
 
 function DrawerContent(props) {
-  const [data, setData] = useState({});
+  const [data, setData] = useState();
   const [image, setImage] = useState({
     uri: 'https://cdn-icons.flaticon.com/png/512/1144/premium/1144709.png?token=exp=1655978291~hmac=238a0f3dd589e12f106cf1cf6f4a8b4d',
   });
@@ -22,9 +22,11 @@ function DrawerContent(props) {
       const result = await axios.get(`user/${id}`);
       setData(result.data.data[0]);
       console.log(result.data.data[0]);
-      setImage({
-        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
-      });
+      if (result.data.data[0].image) {
+        setImage({
+          uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -41,14 +43,12 @@ function DrawerContent(props) {
   };
 
   useEffect(() => {
-    console.log('use effect jalan');
-    if (data) {
-      console.log('ada data');
-    } else {
-      console.log('data empty');
+    if (!data) {
       getUser();
+    } else {
+      return;
     }
-  }, []);
+  }, [data]);
 
   return (
     <View style={styles.container}>
@@ -57,16 +57,17 @@ function DrawerContent(props) {
           <View style={styles.avatar}>
             <Image
               style={{
+                height: 40,
                 width: 40,
                 resizeMode: 'cover',
-                borderRadius: 8,
+                borderRadius: 20,
               }}
               source={image}
             />
           </View>
           <View style={styles.biodata}>
-            <Text style={styles.title}>{data.firstName}</Text>
-            <Text style={styles.caption}>@bagustea</Text>
+            <Text style={styles.title}>{data ? data.firstName : ''}</Text>
+            <Text style={styles.caption}>{data ? data.lastName : ''}</Text>
           </View>
         </View>
         <DrawerItemList {...props} />

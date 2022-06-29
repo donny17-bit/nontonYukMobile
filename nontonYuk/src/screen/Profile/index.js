@@ -30,6 +30,7 @@ function Profile(props) {
     scheduleId: '',
   });
   const [schedule, setSchedule] = useState({1: ''});
+  const [imgUser, setImgUser] = useState();
   const [movie, setMovie] = useState({});
   const [imgClicked, setImgClicked] = useState(false);
   const [formInfo, setFormInfo] = useState({
@@ -96,9 +97,11 @@ function Profile(props) {
       const id = await AsyncStorage.getItem('id');
       const result = await axios.get(`user/${id}`);
       setData(result.data.data);
-      setImage({
-        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
-      });
+      if (result.data.data[0].image) {
+        setImage({
+          uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -174,18 +177,38 @@ function Profile(props) {
     });
   };
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   const handleOpenCamera = async () => {
-    const result = await launchCamera({mediaType: 'photo'});
-    console.log(result);
+    const result = await launchCamera({mediaType: 'photo', saveToPhotos: true});
+    setImgUser(result.assets);
+    console.log(result.assets);
+    toggleModal();
   };
 
   const handleOpenGalery = async () => {
     const result = await launchImageLibrary({mediaType: 'photo'});
-    console.log(result);
+    setImgUser(result.assets);
+    console.log(result.assets);
+    toggleModal();
   };
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const updateImg = async () => {
+    try {
+      // cannot save image
+      const id = await AsyncStorage.getItem('id');
+      console.log(id);
+      console.log(imgUser[0]);
+      const result = await axios.patch(`user/image/${id}`, {
+        image: imgUser[0],
+      });
+      console.log(result);
+    } catch (error) {
+      console.log(error.response.data);
+      console.log('error upload');
+    }
   };
 
   useEffect(() => {
@@ -201,7 +224,7 @@ function Profile(props) {
       <View style={styles.infoContainerTop}>
         <TouchableOpacity onPress={() => setImgClicked(true)}>
           <Image
-            source={image}
+            source={imgUser ? imgUser : image}
             style={{
               borderRadius: 136 / 2,
               height: 136,
@@ -213,6 +236,20 @@ function Profile(props) {
         </TouchableOpacity>
         {imgClicked ? (
           <View>
+            {imgUser ? (
+              <TouchableOpacity
+                onPress={updateImg}
+                style={[
+                  styles.button,
+                  {marginTop: 15, backgroundColor: 'green'},
+                ]}>
+                <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                  Save Image
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <></>
+            )}
             <TouchableOpacity
               onPress={toggleModal}
               style={[styles.button, {marginVertical: 10}]}>
@@ -256,7 +293,10 @@ function Profile(props) {
               </View>
             </Modal>
             <TouchableOpacity
-              onPress={() => setImgClicked(false)}
+              onPress={() => {
+                setImgClicked(false);
+                setImgUser();
+              }}
               style={[
                 styles.button,
                 {
