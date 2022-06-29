@@ -8,10 +8,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Button,
+  Pressable,
+  Dimensions,
 } from 'react-native';
 import styles from './style';
 import axios from '../../utils/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Feather';
 
 function LoginScreen(props) {
   // const handleLogin = () => {
@@ -19,6 +22,9 @@ function LoginScreen(props) {
   //     screen: 'Home',
   //   });
   // };
+  const windowWidth = Dimensions.get('window').width;
+  // const [focus, setFocus] = useState();
+  const [secure, setSecure] = useState(true);
 
   const handleRegister = () => {
     props.navigation.navigate('Register');
@@ -108,13 +114,24 @@ function LoginScreen(props) {
               Password
             </Text>
           </View>
-          <SafeAreaView>
+          <SafeAreaView style={styles.input}>
             <TextInput
+              secureTextEntry={secure}
               placeholder="Input your password ..."
               placeholderTextColor={'grey'}
-              style={styles.input}
+              style={{maxWidth: windowWidth - 90, color: 'black'}}
               onChangeText={text => handleChangeForm(text, 'password')}
             />
+            <Pressable onPress={() => setSecure(!secure)}>
+              <Icon
+                style={{
+                  paddingTop: 10,
+                }}
+                name={secure ? 'eye' : 'eye-off'}
+                size={20}
+                color="gray"
+              />
+            </Pressable>
           </SafeAreaView>
         </View>
         <View style={{padding: 20}}>

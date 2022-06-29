@@ -17,6 +17,9 @@ import {StyleSheet} from 'react-native';
 import axios from '../../utils/axios';
 
 function Profile(props) {
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [sort, setSort] = useState('ASC');
+  const [searchName, setSearchName] = useState('');
   const [data, setData] = useState([]);
   const month = [
     {name: 'January', id: 1},
@@ -32,12 +35,12 @@ function Profile(props) {
     {name: 'November', id: 11},
     {name: 'December', id: 12},
   ];
-  const countries = ['Egypt', 'Canada', 'Australia', 'Ireland'];
+  const sorting = ['A - Z', 'Z - A'];
 
-  const getMoviesByMonth = async bulan => {
+  const getMovies = async (sort, searchName, currentMonth) => {
     try {
       const result = await axios.get(
-        `movie?searchRelease=${bulan}&limit=10&page=1`,
+        `movie?sort=${sort}&searchName=${searchName}&limit=10&searchRelease=${currentMonth}`,
       );
       setData(result.data.data);
     } catch (error) {
@@ -45,11 +48,27 @@ function Profile(props) {
     }
   };
 
+  const handleSort = index => {
+    console.log(index);
+    if (index == 0) {
+      setSort('ASC');
+      getMovies('ASC', searchName, currentMonth);
+    } else {
+      setSort('DESC');
+      getMovies('DESC', searchName, currentMonth);
+    }
+  };
+
+  const handleSearch = event => {
+    const name = event.nativeEvent.text;
+    console.log(name);
+    setSearchName(name);
+    getMovies(sort, name, currentMonth);
+  };
+
   const handleMonth = bulan => {
-    getMoviesByMonth(bulan);
-    // const handleChangeForm = (text, name) => {
-    //   setForm({...form, [name]: text});
-    // };
+    setCurrentMonth(bulan);
+    getMovies(sort, searchName, bulan);
   };
 
   const handleDetail = id => {
@@ -57,166 +76,161 @@ function Profile(props) {
   };
 
   useEffect(() => {
-    // default temporary
-    getMoviesByMonth('5');
+    getMovies(sort, searchName, currentMonth);
   }, []);
 
   return (
-    <View>
-      <View style={{padding: 20}}>
-        <View>
-          <Text style={styles.title}>List Movie</Text>
-        </View>
-        <View style={styles.container}>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 10,
-              height: 40,
-              // borderColor: 'black',
-              // borderWidth: 2,
-            }}>
-            <SelectDropdown
-              defaultButtonText={'Sort'}
-              buttonStyle={{
-                backgroundColor: 'white',
-                borderColor: '#DEDEDE',
-                borderWidth: 1,
-                borderRadius: 16,
-                height: 37,
-                flex: 1,
-
-                paddingRight: 10,
-              }}
-              buttonTextStyle={{
-                color: '#4E4B66',
-                fontSize: 16,
-                textAlign: 'left',
-              }}
-              // rowStyle={{borderRadius: 16}}
-              rowTextStyle={{color: '#4E4B66'}}
-              dropdownIconPosition={'right'}
-              renderDropdownIcon={isOpened => {
-                return (
-                  <FontAwesome
-                    name={isOpened ? 'chevron-up' : 'chevron-down'}
-                    color={'#4E4B66'}
-                    size={13}
+    <SafeAreaView>
+      <FlatList
+        data={['1']}
+        renderItem={({item}) => (
+          <View>
+            <View style={{padding: 20}}>
+              <View>
+                <Text style={styles.title}>List Movie</Text>
+              </View>
+              <View style={styles.container}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginTop: 10,
+                    height: 40,
+                  }}>
+                  <SelectDropdown
+                    defaultButtonText={'Sort'}
+                    buttonStyle={styles.sort}
+                    buttonTextStyle={{
+                      color: '#4E4B66',
+                      fontSize: 16,
+                      textAlign: 'left',
+                    }}
+                    rowTextStyle={{color: '#4E4B66'}}
+                    dropdownIconPosition={'right'}
+                    renderDropdownIcon={isOpened => {
+                      return (
+                        <FontAwesome
+                          name={isOpened ? 'chevron-up' : 'chevron-down'}
+                          color={'#4E4B66'}
+                          size={13}
+                        />
+                      );
+                    }}
+                    data={sorting}
+                    onSelect={(selectedItem, index) => {
+                      handleSort(index);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
                   />
-                );
-              }}
-              data={countries}
-              onSelect={(selectedItem, index) => {
-                console.log(selectedItem, index);
-              }}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                // text represented after item is selected
-                // if data array is an array of objects then return selectedItem.property to render after item is selected
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                // text represented for each item in dropdown
-                // if data array is an array of objects then return item.property to represent item in dropdown
-                return item;
-              }}
-            />
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  flex: 2,
-                  paddingHorizontal: 15,
-                  paddingBottom: 8,
-                  marginLeft: 10,
-                },
-              ]}
-              placeholder={'Search movie name'}
-              placeholderTextColor={'#4E4B66'}
-              // value={formInfo.firstName}
-              // onChangeText={text => handleDetailInfo(text, 'firstName')}
-            />
-          </View>
-          <FlatList
-            data={month}
-            horizontal={true}
-            keyExtractor={item => item.id}
-            renderItem={({item}) => (
-              <View
-                style={{
-                  paddingTop: 20,
-                  flexDirection: 'row',
-                  marginEnd: 10,
-                }}>
-                <Button
-                  title={item.name}
-                  color="#5F2EEA"
-                  onPress={e => handleMonth(`${item.id}`)}
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        flex: 2,
+                        paddingHorizontal: 15,
+                        paddingBottom: 8,
+                        marginLeft: 10,
+                      },
+                    ]}
+                    placeholder={'Search movie name'}
+                    placeholderTextColor={'#4E4B66'}
+                    onSubmitEditing={event => handleSearch(event)}
+                    // value={formInfo.firstName}
+                    // onChangeText={text => handleDetailInfo(text, 'firstName')}
+                  />
+                </View>
+                <FlatList
+                  data={month}
+                  horizontal={true}
+                  keyExtractor={item => item.id}
+                  renderItem={({item}) => (
+                    <View
+                      style={{
+                        paddingTop: 20,
+                        flexDirection: 'row',
+                        marginEnd: 10,
+                      }}>
+                      <Button
+                        title={item.name}
+                        color="#5F2EEA"
+                        onPress={e => handleMonth(`${item.id}`)}
+                      />
+                    </View>
+                  )}
                 />
               </View>
-            )}
-          />
-        </View>
-        {/* <View style={styles.container}> */}
-        <FlatList
-          style={{marginBottom: 220}}
-          numColumns={2}
-          data={data}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <View style={styles.imageCard}>
-              <Image
-                source={{
-                  uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${item.image}`,
-                }}
-                style={{
-                  width: 120,
-                  height: 180,
-                  resizeMode: 'cover',
-                }}
+              {/* <View style={styles.container}> */}
+              <FlatList
+                // style={{marginBottom: 220}}
+                numColumns={2}
+                data={data}
+                keyExtractor={item => item.id}
+                renderItem={({item}) => (
+                  <View style={styles.imageCard}>
+                    <Image
+                      source={{
+                        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${item.image}`,
+                      }}
+                      style={{
+                        width: 120,
+                        height: 180,
+                        resizeMode: 'cover',
+                      }}
+                    />
+                    <Text
+                      style={{
+                        paddingTop: 10,
+                        color: 'black',
+                        fontSize: 14,
+                        fontWeight: '600',
+                      }}>
+                      {item.name}
+                    </Text>
+                    <Text
+                      style={{
+                        paddingTop: 10,
+                        color: '#A0A3BD',
+                        fontSize: 11,
+                        fontWeight: '300',
+                      }}>
+                      {item.category}
+                    </Text>
+                    <View style={{paddingTop: 20}}>
+                      <Button
+                        title="Details"
+                        style={{borderColor: '#5F2EEA'}}
+                        onPress={e => handleDetail(item.id)}
+                      />
+                    </View>
+                  </View>
+                )}
               />
-              <Text
-                style={{
-                  paddingTop: 10,
-                  color: 'black',
-                  fontSize: 14,
-                  fontWeight: '600',
-                }}>
-                {item.name}
-              </Text>
-              <Text
-                style={{
-                  paddingTop: 10,
-                  color: '#A0A3BD',
-                  fontSize: 11,
-                  fontWeight: '300',
-                }}>
-                {item.category}
-              </Text>
-              <View style={{paddingTop: 20}}>
-                <Button
-                  title="Details"
-                  style={{borderColor: '#5F2EEA'}}
-                  onPress={e => handleDetail(item.id)}
-                />
-              </View>
             </View>
-          )}
-        />
-        {/* </View> */}
-      </View>
-    </View>
+          </View>
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
 export default Profile;
 
 const styles = StyleSheet.create({
+  sort: {
+    backgroundColor: 'white',
+    borderColor: '#DEDEDE',
+    borderWidth: 1,
+    borderRadius: 16,
+    height: 37,
+    flex: 1,
+    paddingRight: 10,
+  },
   container: {
-    // flexDirection: 'row',
-    // paddingTop: 20,
     paddingBottom: 20,
-    // flexWrap: 'wrap',
-    // justifyContent: 'space-between',
   },
   title: {
     color: '#14142B',
