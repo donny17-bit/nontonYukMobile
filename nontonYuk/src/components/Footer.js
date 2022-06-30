@@ -1,7 +1,14 @@
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity, Image, Text} from 'react-native';
 
-export default function Footer() {
+export default function Footer(props) {
+  const handleHome = () => {
+    props.navigation.navigate('Home');
+  };
+  const handleListMovie = () => {
+    props.navigation.navigate('ListMovie');
+  };
+
   return (
     <>
       <View style={styles.footer}>
@@ -17,26 +24,27 @@ export default function Footer() {
         <Text style={{color: 'black', fontSize: 16, fontWeight: '600'}}>
           Explore
         </Text>
-        {/* link */}
         <View style={{paddingTop: 20, flexDirection: 'row'}}>
-          <Text
-            style={{
-              flex: 1,
-              color: '#6E7191',
-              fontSize: 14,
-              fontWeight: '400',
-            }}>
-            Home
-          </Text>
-          <Text
-            style={{
-              flex: 2,
-              color: '#6E7191',
-              fontSize: 14,
-              fontWeight: '400',
-            }}>
-            List Movie
-          </Text>
+          <TouchableOpacity onPress={handleHome} style={{flex: 1}}>
+            <Text
+              style={{
+                color: '#6E7191',
+                fontSize: 14,
+                fontWeight: '400',
+              }}>
+              Home
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleListMovie} style={{flex: 2}}>
+            <Text
+              style={{
+                color: '#6E7191',
+                fontSize: 14,
+                fontWeight: '400',
+              }}>
+              List Movie
+            </Text>
+          </TouchableOpacity>
         </View>
         <Text
           style={{

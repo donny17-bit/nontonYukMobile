@@ -247,7 +247,7 @@ function Order(props) {
                 </Text>
               </TouchableOpacity>
             </View>
-            <Footer />
+            <Footer {...props} />
           </>
         )}
       />
