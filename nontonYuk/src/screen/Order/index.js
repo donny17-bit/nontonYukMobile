@@ -12,14 +12,15 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Seat from '../../components/Seat';
+import axios from '../../utils/axios';
 
 function Order(props) {
   const render = [0];
   const {dataOrder} = props.route.params;
-  const date = `${dataOrder.dateBooking.getDate()}-${dataOrder.dateBooking.getMonth()}-${dataOrder.dateBooking.getFullYear()}`;
+  const date = `${dataOrder.dateBooking.getFullYear()}-${dataOrder.dateBooking.getMonth()}-${dataOrder.dateBooking.getDate()}`;
   const listSeat = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
   const [selectedSeat, setSelectedSeat] = useState([]);
-  const [reservedSeat, setReservedSeat] = useState(['A1', 'C7']);
+  const [reservedSeat, setReservedSeat] = useState([]);
 
   const handlePay = () => {
     props.navigation.navigate('Payment', {
@@ -50,9 +51,25 @@ function Order(props) {
     console.log(selectedSeat);
   };
 
+  const getSeat = async () => {
+    try {
+      const result = await axios.get(
+        `booking/seat?scheduleId=${dataOrder.scheduleId}&dateBooking=${date}&timeBooking=${dataOrder.timeBooking}`,
+      );
+      console.log(result.data);
+      setReservedSeat(result.data.data);
+    } catch (error) {
+      console.log(error.response.data);
+      console.log('error get seat');
+    }
+  };
+
   useEffect(() => {
-    // console.log(props.route.params.dataOrder);
-  }, []);
+    if (!dataOrder) {
+      return;
+    }
+    getSeat();
+  }, [dataOrder]);
 
   return (
     <SafeAreaView>
@@ -116,7 +133,7 @@ function Order(props) {
                   }}>
                   <Text
                     style={{fontSize: 14, fontWeight: '400', color: '#6B6B6B'}}>
-                    {date}
+                    {dataOrder.dateBooking.toString().slice(0, 10)}
                   </Text>
                   <Text
                     style={{fontSize: 14, fontWeight: '600', color: '#14142B'}}>

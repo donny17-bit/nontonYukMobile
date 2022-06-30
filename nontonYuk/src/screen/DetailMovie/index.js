@@ -32,7 +32,7 @@ function DetailMovie(props) {
     'bali',
   ];
   const [selectedCity, setSelectedCity] = useState('');
-  const [selectedTime, setSelectedTime] = useState();
+  const [selectedTime, setSelectedTime] = useState({time: '', index: ''});
   const {id} = props.route.params;
   const [data, setData] = useState({});
   const [releaseDate, setReleaseDate] = useState('');
