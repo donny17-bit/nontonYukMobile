@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import Seat from '../../components/Seat';
 import axios from '../../utils/axios';
+import Icon from 'react-native-vector-icons/Feather';
+import Footer from '../../components/Footer';
 
 function Order(props) {
   const render = [0];
@@ -69,7 +71,7 @@ function Order(props) {
       return;
     }
     getSeat();
-  }, [dataOrder]);
+  }, []);
 
   return (
     <SafeAreaView>
@@ -92,6 +94,60 @@ function Order(props) {
                     />
                   )}
                 />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: 'black',
+                    padding: 20,
+                  }}>
+                  Seating key
+                </Text>
+                <View
+                  style={{
+                    paddingHorizontal: 20,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                  }}>
+                  <View style={styles.infoContainer}>
+                    <Icon size={20} name="arrow-down" color={'black'} />
+                    <Text style={styles.infoText}>A - G</Text>
+                  </View>
+                  <View style={styles.infoContainer}>
+                    <Icon size={20} name="arrow-right" color={'black'} />
+                    <Text style={styles.infoText}>1 - 14</Text>
+                  </View>
+                  <View style={styles.infoContainer}>
+                    <View
+                      style={{
+                        backgroundColor: '#D6D8E7',
+                        width: 20,
+                        borderRadius: 4,
+                      }}
+                    />
+                    <Text style={styles.infoText}>Available</Text>
+                  </View>
+                  <View style={styles.infoContainer}>
+                    <View
+                      style={{
+                        backgroundColor: '#5F2EEA',
+                        width: 20,
+                        borderRadius: 4,
+                      }}
+                    />
+                    <Text style={styles.infoText}>Selected</Text>
+                  </View>
+                  <View style={styles.infoContainer}>
+                    <View
+                      style={{
+                        backgroundColor: '#6E7191',
+                        width: 20,
+                        borderRadius: 4,
+                      }}
+                    />
+                    <Text style={styles.infoText}>Sold</Text>
+                  </View>
+                </View>
               </View>
               <Text style={[styles.title, {marginTop: 40}]}>Order Info</Text>
               <View style={styles.formContainerTop}>
@@ -191,101 +247,7 @@ function Order(props) {
                 </Text>
               </TouchableOpacity>
             </View>
-            {/* footer */}
-            <View style={styles.footer}>
-              <Image source={require('../../assets/Tickitz-2.png')} />
-              <View style={{paddingTop: 20, paddingBottom: 40}}>
-                <Text style={styles.commonText}>
-                  Stop waiting in line. Buy tickets
-                </Text>
-                <Text style={styles.commonText}>
-                  conveniently, watch movies quietly.
-                </Text>
-              </View>
-              <Text style={{color: 'black', fontSize: 16, fontWeight: '600'}}>
-                Explore
-              </Text>
-              {/* link */}
-              <View style={{paddingTop: 20, flexDirection: 'row'}}>
-                <Text
-                  style={{
-                    flex: 1,
-                    color: '#6E7191',
-                    fontSize: 14,
-                    fontWeight: '400',
-                  }}>
-                  Home
-                </Text>
-                <Text
-                  style={{
-                    flex: 2,
-                    color: '#6E7191',
-                    fontSize: 14,
-                    fontWeight: '400',
-                  }}>
-                  List Movie
-                </Text>
-              </View>
-              <Text
-                style={{
-                  paddingTop: 40,
-                  color: 'black',
-                  fontSize: 16,
-                  fontWeight: '600',
-                }}>
-                Our Sponsor
-              </Text>
-              <View style={{flexDirection: 'row', paddingTop: 20}}>
-                <Image
-                  source={require('../../assets/ebv.id.png')}
-                  style={{marginRight: 20}}
-                />
-                <Image
-                  source={require('../../assets/CineOne21.png')}
-                  style={{marginRight: 20, marginTop: 10}}
-                />
-                <Image
-                  source={require('../../assets/hiflix.png')}
-                  style={{marginRight: 20}}
-                />
-              </View>
-              <Text
-                style={{
-                  paddingTop: 50,
-                  color: 'black',
-                  fontSize: 16,
-                  fontWeight: '600',
-                }}>
-                Follow us
-              </Text>
-              <View style={{paddingTop: 20, flexDirection: 'row'}}>
-                <Image
-                  source={require('../../assets/facebook.png')}
-                  style={{marginRight: 20}}
-                />
-                <Image
-                  source={require('../../assets/instagram.png')}
-                  style={{marginRight: 20}}
-                />
-                <Image
-                  source={require('../../assets/twitter.png')}
-                  style={{marginRight: 20}}
-                />
-                <Image
-                  source={require('../../assets/youtube.png')}
-                  style={{marginRight: 20}}
-                />
-              </View>
-              <Text
-                style={{
-                  color: '#6E7191',
-                  fontSize: 13,
-                  fontWeight: '400',
-                  paddingTop: 50,
-                }}>
-                © 2020 Tickitz. All Rights Reserved.
-              </Text>
-            </View>
+            <Footer />
           </>
         )}
       />
@@ -296,15 +258,17 @@ function Order(props) {
 export default Order;
 
 const styles = StyleSheet.create({
-  commonText: {
-    color: '#6E7191',
-    fontSize: 12,
-    fontWeight: '400',
+  infoText: {
+    marginLeft: 10,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#4E4B66',
   },
-  footer: {
-    padding: 20,
-    paddingTop: 50,
-    backgroundColor: '#FFFFFF',
+  infoContainer: {
+    flexDirection: 'row',
+    marginRight: 40,
+    width: 100,
+    marginBottom: 20,
   },
   button: {
     backgroundColor: '#5F2EEA',
