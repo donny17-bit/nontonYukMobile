@@ -16,7 +16,6 @@ import Seat from '../../components/Seat';
 function Order(props) {
   const render = [0];
   const {dataOrder} = props.route.params;
-  // console.log(dataOrder);
   const date = `${dataOrder.dateBooking.getDate()}-${dataOrder.dateBooking.getMonth()}-${dataOrder.dateBooking.getFullYear()}`;
   const listSeat = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
   const [selectedSeat, setSelectedSeat] = useState([]);

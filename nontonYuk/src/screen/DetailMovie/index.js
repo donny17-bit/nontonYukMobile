@@ -23,6 +23,7 @@ function DetailMovie(props) {
   const [open, setOpen] = useState(false);
   const windowWidth = Dimensions.get('window').width;
   const cities = [
+    'All city',
     'bandung',
     'jakarta',
     'yogyakarta',
@@ -30,8 +31,8 @@ function DetailMovie(props) {
     'balikpapan',
     'bali',
   ];
-  const [selectedCity, setSelectedCity] = useState('Set a city');
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedTime, setSelectedTime] = useState();
   const {id} = props.route.params;
   const [data, setData] = useState({});
   const [releaseDate, setReleaseDate] = useState('');
@@ -48,16 +49,18 @@ function DetailMovie(props) {
     }
   };
 
-  const selectTime = time => {
+  const selectTime = (time, index) => {
     setDataOrder({...dataOrder, timeBooking: time});
-    // setSelectedTime(time);
+    setSelectedTime({time, index});
+    console.log(index);
+    console.log(selectedTime);
     console.log(dataOrder);
   };
 
-  const getSchedule = async () => {
+  const getSchedule = async selectedCity => {
     try {
       const result = await axios.get(
-        `schedule?sort=id&searchLocation=&searchMovieId=${id}&page=1&limit=10`,
+        `schedule?sort=id&searchLocation=${selectedCity}&searchMovieId=${id}&page=1&limit=10`,
       );
       setSchedule(result.data.data);
     } catch (error) {
@@ -97,7 +100,7 @@ function DetailMovie(props) {
   useEffect(() => {
     // default temporary
     getMoviesById();
-    getSchedule();
+    getSchedule(selectedCity);
   }, []);
 
   return (
@@ -227,7 +230,7 @@ function DetailMovie(props) {
                           marginStart: 10,
                           flex: 2,
                         }}>
-                        {selectedItem ? selectedItem : 'Set a city'}
+                        {selectedItem ? selectedItem : 'All city'}
                       </Text>
                       <Icon name={'chevron-down'} color={'#4E4B66'} size={20} />
                     </View>
@@ -237,6 +240,11 @@ function DetailMovie(props) {
                 onSelect={(selectedItem, index) => {
                   setDataOrder({...dataOrder, location: selectedItem});
                   setSelectedCity(selectedItem);
+                  if (index != 0) {
+                    getSchedule(selectedItem);
+                  } else {
+                    getSchedule('');
+                  }
                   console.log(selectedItem, index);
                 }}
                 rowTextForSelection={(item, index) => {
@@ -247,7 +255,7 @@ function DetailMovie(props) {
                 data={schedule}
                 keyExtractor={item => item.id}
                 style={{paddingBottom: 20}}
-                renderItem={({item}) => (
+                renderItem={({item, index}) => (
                   <View style={styles.card}>
                     <View
                       style={{
@@ -283,20 +291,18 @@ function DetailMovie(props) {
                         }}
                         numColumns={6}
                         data={item.time.split(',')}
+                        extraData={index}
                         renderItem={({item}) => (
                           <View>
-                            <TouchableOpacity onPress={() => selectTime(item)}>
+                            <TouchableOpacity
+                              onPress={() => selectTime(item, index)}>
                               <Text
-                                style={{
-                                  alignSelf: 'center',
-                                  fontSize: 12,
-                                  fontWeight: '400',
-                                  color: '#4E4B66',
-                                  paddingEnd: 10,
-                                  paddingBottom: 10,
-                                  // marginHorizontal: 10,
-                                  // marginVertical: 10,
-                                }}>
+                                style={
+                                  selectedTime.time == item &&
+                                  selectedTime.index == index
+                                    ? [styles.time, {color: 'blue'}]
+                                    : styles.time
+                                }>
                                 {item}WIB
                               </Text>
                             </TouchableOpacity>
@@ -510,5 +516,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignSelf: 'center',
     flexDirection: 'row',
+  },
+  time: {
+    alignSelf: 'center',
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#4E4B66',
+    paddingEnd: 10,
+    paddingBottom: 10,
   },
 });
