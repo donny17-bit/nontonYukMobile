@@ -27,10 +27,12 @@ function Profile(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [activeMenu, setActiveMenu] = useState('profile');
   const [data, setData] = useState();
-  const [booking, setBooking] = useState({
-    scheduleId: '',
-  });
-  const [schedule, setSchedule] = useState({1: ''});
+  const [booking, setBooking] = useState();
+  //   {
+  //   scheduleId: '',
+  // }
+  // const [schedule, setSchedule] = useState({1: {premiere: ''}});
+  const [schedule, setSchedule] = useState();
   const [imgUser, setImgUser] = useState();
   const [movie, setMovie] = useState({});
   const [imgClicked, setImgClicked] = useState(false);
@@ -104,51 +106,19 @@ function Profile(props) {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data);
+      console.log('get user error');
     }
   };
 
   const getBooking = async () => {
     try {
+      console.log('get booking jalan');
       const id = await AsyncStorage.getItem('id');
       const result = await axios.get(`booking/user/${id}`);
       setBooking(result.data.data);
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const getSchedule = async () => {
-    try {
-      // console.log(booking);
-      booking.map(async item => {
-        const id = item.scheduleId;
-        console.log(id);
-        const result = await axios.get(`schedule/${id}`);
-        if (result.data.data[0].movieId) {
-          setMovie({...movie, [result.data.data[0].movieId]: ''});
-          // setCountMovie([...countMovie, result.data.data[0].movieId]);
-        }
-        setSchedule({
-          ...schedule,
-          [result.data.data[0].id]: result.data.data[0],
-        });
-      });
-    } catch (error) {
-      console.log('get schedule error');
-    }
-  };
-
-  const getMovie = async () => {
-    try {
-      Object.keys(movie).map(async (item, index) => {
-        console.log(item);
-        const result = await axios.get(`movie/${item}`);
-        setMovie({...movie, [item]: result.data.data[0]});
-        // console.log(result.data.data[0]);
-      });
-    } catch (error) {
-      console.log('get movie error');
     }
   };
 
@@ -164,7 +134,6 @@ function Profile(props) {
 
   const handleTicket = (item, movie) => {
     console.log(item);
-    // console.log(movie);
     props.navigation.navigate('Ticket', {
       data: {
         id: item.id,
@@ -198,27 +167,89 @@ function Profile(props) {
 
   const updateImg = async () => {
     try {
-      // cannot save image
       const id = await AsyncStorage.getItem('id');
       console.log(id);
       console.log(imgUser[0]);
-      const result = await axios.patch(`user/image/${id}`, {
-        image: imgUser[0],
+      const newImage = new FormData();
+      newImage.append('image', {
+        name: imgUser[0].fileName,
+        type: imgUser[0].type,
+        uri: imgUser[0].uri,
       });
-      console.log(result);
+      const result = await axios.patch(`user/image/${id}`, newImage);
+      console.log(result.data.data);
+      setImgUser();
+      setImage({
+        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data.image}`,
+      });
     } catch (error) {
       console.log(error.response.data);
       console.log('error upload');
     }
   };
 
+  const getSchedule = () => {
+    if (booking) {
+      console.log('schedule jalan');
+      let tempSchedule = {};
+      let tempMovie = {};
+      booking.map(async item => {
+        try {
+          const id = item.scheduleId;
+          console.log(id);
+          const result = await axios.get(`schedule/${id}`);
+          tempMovie = {...tempMovie, [result.data.data[0].movieId]: ''};
+          tempSchedule = {
+            ...tempSchedule,
+            [result.data.data[0].id]: result.data.data[0],
+          };
+          setMovie(tempMovie);
+          setSchedule(tempSchedule);
+        } catch (error) {
+          console.log('get schedule error');
+          console.log(error.response.data);
+        }
+      });
+    } else {
+      console.log('schedule tdk jalan');
+    }
+  };
+
+  const getMovie = () => {
+    let tempMovie = {};
+    Object.keys(movie).map(async (item, index) => {
+      try {
+        console.log(item);
+        const result = await axios.get(`movie/${item}`);
+        tempMovie = {...tempMovie, [item]: result.data.data[0]};
+        setMovie(tempMovie);
+        // console.log(result.data.data[0]);
+      } catch (error) {
+        console.log('get movie error');
+      }
+    });
+  };
+
+  console.log(movie);
+
   useEffect(() => {
-    console.log('use effect jalan');
-    getUser();
-    getBooking();
-    getSchedule();
-    getMovie();
-  }, []);
+    if (schedule) {
+      console.log('get movie jalan');
+      getMovie();
+      return;
+    }
+  }, [schedule]);
+
+  useEffect(() => {
+    if (booking) {
+      getUser();
+      getSchedule();
+    } else {
+      console.log('use effect jalan');
+      getUser();
+      getBooking();
+    }
+  }, [booking]);
 
   const profileActive = (
     <View style={styles.container}>
@@ -422,11 +453,13 @@ function Profile(props) {
             <View style={{padding: 20}}>
               <Image
                 source={
-                  schedule[item.scheduleId].premiere === 'hiflix'
-                    ? require('../../assets/hiflix.png')
-                    : schedule[item.scheduleId].premiere === 'ebv.id'
-                    ? require('../../assets/ebv.id.png')
-                    : require('../../assets/CineOne21.png')
+                  schedule
+                    ? schedule[item.scheduleId].premiere === 'hiflix'
+                      ? require('../../assets/hiflix.png')
+                      : schedule[item.scheduleId].premiere === 'ebv.id'
+                      ? require('../../assets/ebv.id.png')
+                      : require('../../assets/CineOne21.png')
+                    : ''
                 }
               />
               <Text
@@ -449,7 +482,7 @@ function Profile(props) {
                   fontWeight: '600',
                   marginBottom: 20,
                 }}>
-                {movie[schedule[item.scheduleId].movieId].name}
+                {schedule ? movie[schedule[item.scheduleId].movieId].name : ''}
               </Text>
             </View>
             <View
@@ -465,7 +498,11 @@ function Profile(props) {
                     handleTicket(item, movie[schedule[item.scheduleId].movieId])
                   }>
                   <Text
-                    style={{color: 'white', fontSize: 14, fontWeight: '700'}}>
+                    style={{
+                      color: 'white',
+                      fontSize: 14,
+                      fontWeight: '700',
+                    }}>
                     Ticket in active
                   </Text>
                 </TouchableOpacity>
@@ -474,7 +511,11 @@ function Profile(props) {
                   disabled
                   style={[styles.btnTicket, {backgroundColor: 'gray'}]}>
                   <Text
-                    style={{color: 'white', fontSize: 14, fontWeight: '700'}}>
+                    style={{
+                      color: 'white',
+                      fontSize: 14,
+                      fontWeight: '700',
+                    }}>
                     Ticket used
                   </Text>
                 </TouchableOpacity>

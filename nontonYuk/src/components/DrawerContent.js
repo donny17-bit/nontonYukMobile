@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../utils/axios';
 
 function DrawerContent(props) {
+  const [id, setId] = useState();
+  console.log(id);
   const [data, setData] = useState();
   const [image, setImage] = useState({
     uri: 'https://cdn-icons.flaticon.com/png/512/1144/premium/1144709.png?token=exp=1655978291~hmac=238a0f3dd589e12f106cf1cf6f4a8b4d',
@@ -17,9 +19,9 @@ function DrawerContent(props) {
 
   const getUser = async () => {
     try {
-      const id = await AsyncStorage.getItem('id');
-      console.log(id);
-      const result = await axios.get(`user/${id}`);
+      const idUser = await AsyncStorage.getItem('id');
+      console.log(idUser);
+      const result = await axios.get(`user/${idUser}`);
       setData(result.data.data[0]);
       console.log(result.data.data[0]);
       if (result.data.data[0].image) {
@@ -28,29 +30,64 @@ function DrawerContent(props) {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data);
+      console.log('get data error');
     }
+  };
+
+  const getId = async () => {
+    const id1 = await AsyncStorage.getItem('id');
+    setId(id1);
   };
 
   const handleLogout = async () => {
     try {
-      alert('Logout');
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      await axios.post('auth/logout', {
+        refreshToken: refreshToken,
+      });
+      setData();
+      setId();
       await AsyncStorage.clear();
       props.navigation.navigate('AuthScreen', {
         screen: 'Login',
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error.response.data);
+      console.log('logout error');
+    }
   };
 
   useEffect(() => {
-    if (!data) {
+    if (id) {
       console.log('get user data');
-      // get user data
       getUser();
-    } else {
-      return;
     }
-  }, [data]);
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) {
+      getId();
+    }
+  });
+
+  // useEffect(() => {
+  //   // if (!id) {
+  //   console.log('get id jalan');
+  //   const id2 = AsyncStorage.getItem('id').then(value => {
+  //     console.log(value);
+  //     return value;
+  //   });
+  //   setId(id2);
+  //   getUser();
+  //   // return;
+  //   // } else
+  //   if (id == data.id) {
+  //     console.log('get user ke 2');
+  //     getUser();
+  //   }
+  //   // }
+  // }, [id]);
 
   return (
     <View style={styles.container}>
