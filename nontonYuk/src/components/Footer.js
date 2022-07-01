@@ -12,8 +12,20 @@ export default function Footer(props) {
   return (
     <>
       <View style={styles.footer}>
-        <Image source={require('../assets/Tickitz-2.png')} />
-        <View style={{paddingTop: 20, paddingBottom: 40}}>
+        <Image
+          source={require('../assets/Tickitz-2.png')}
+          style={{
+            height: 80,
+            width: 150,
+            resizeMode: 'contain',
+            alignSelf: 'flex-start',
+          }}
+        />
+        <View
+          style={{
+            paddingTop: 20,
+            paddingBottom: 40,
+          }}>
           <Text style={styles.commonText}>
             Stop waiting in line. Buy tickets
           </Text>

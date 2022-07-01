@@ -9,7 +9,15 @@ export default function Header(props) {
   return (
     <View style={style.header}>
       <View>
-        <Image source={require('../assets/Vector.png')} />
+        <Image
+          source={require('../assets/Tickitz-2.png')}
+          style={{
+            height: 30,
+            width: 80,
+            resizeMode: 'contain',
+            alignSelf: 'flex-start',
+          }}
+        />
       </View>
       <TouchableOpacity onPress={openDrawer}>
         <Image source={require('../assets/Group.png')} />

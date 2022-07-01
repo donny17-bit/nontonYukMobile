@@ -24,7 +24,6 @@ function HomeScreen(props) {
   const dispatch = useDispatch();
 
   const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
 
   const [data, setData] = useState([]);
   const [nowShowing, setNowShowing] = useState([]);

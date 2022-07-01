@@ -59,7 +59,7 @@ function Profile(props) {
     const id1 = await AsyncStorage.getItem('id');
     console.log(id1);
     setId(id1);
-    setRefreshing(false);
+    // setRefreshing(false);
   };
 
   const handleDetailInfo = (text, name) => {
