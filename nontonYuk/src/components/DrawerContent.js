@@ -8,13 +8,14 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../utils/axios';
+import {CLOUDINARY, DEFAULT_IMG} from '@env';
 
 function DrawerContent(props) {
   const [id, setId] = useState();
   console.log(id);
   const [data, setData] = useState();
   const [image, setImage] = useState({
-    uri: 'https://cdn-icons.flaticon.com/png/512/1144/premium/1144709.png?token=exp=1655978291~hmac=238a0f3dd589e12f106cf1cf6f4a8b4d',
+    uri: DEFAULT_IMG,
   });
 
   const getUser = async () => {
@@ -26,7 +27,7 @@ function DrawerContent(props) {
       console.log(result.data.data[0]);
       if (result.data.data[0].image) {
         setImage({
-          uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+          uri: CLOUDINARY + result.data.data[0].image,
         });
       }
     } catch (error) {

@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {
-  ScrollView,
   Text,
   StyleSheet,
   View,
   Image,
   TouchableOpacity,
   TextInput,
-  Button,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -19,19 +19,18 @@ import {useSelector, useDispatch} from 'react-redux';
 import {getUserId} from '../../stores/action/user';
 import axios from '../../utils/axios';
 import Footer from '../../components/Footer';
+import {CLOUDINARY} from '@env';
 
 function Profile(props) {
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [id, setId] = useState();
   const [isModalVisible, setModalVisible] = useState(false);
   const [activeMenu, setActiveMenu] = useState('profile');
   const [data, setData] = useState();
   const [booking, setBooking] = useState();
-  //   {
-  //   scheduleId: '',
-  // }
-  // const [schedule, setSchedule] = useState({1: {premiere: ''}});
   const [schedule, setSchedule] = useState();
   const [imgUser, setImgUser] = useState();
   const [movie, setMovie] = useState({});
@@ -48,6 +47,20 @@ function Profile(props) {
   const [image, setImage] = useState({
     uri: 'https://cdn-icons.flaticon.com/png/512/1144/premium/1144709.png?token=exp=1655978291~hmac=238a0f3dd589e12f106cf1cf6f4a8b4d',
   });
+
+  console.log(booking);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getId();
+    getBooking();
+  }, [refreshing]);
+
+  const getId = async () => {
+    const id1 = await AsyncStorage.getItem('id');
+    console.log(id1);
+    setId(id1);
+    setRefreshing(false);
+  };
 
   const handleDetailInfo = (text, name) => {
     console.log(text);
@@ -95,14 +108,34 @@ function Profile(props) {
     });
   };
 
+  // const getUser = async () => {
+  //   try {
+  //     console.log('get user method jalan');
+  //     const result = JSON.parse(await AsyncStorage.getItem('user'));
+  //     console.log('user : ' + result);
+  //     console.log(Object.keys(result));
+  //     setData(result);
+  //     if (result.image) {
+  //       setImage({
+  //         uri: CLOUDINARY + result.image,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log('error get user');
+  //   }
+  // };
+
   const getUser = async () => {
     try {
-      const id = await AsyncStorage.getItem('id');
+      console.log('get user');
+      console.log(id);
+      // const id = await AsyncStorage.getItem('id');
       const result = await axios.get(`user/${id}`);
+      console.log(result.data.data);
       setData(result.data.data);
       if (result.data.data[0].image) {
         setImage({
-          uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data[0].image}`,
+          uri: CLOUDINARY + result.data.data[0].image,
         });
       }
     } catch (error) {
@@ -114,9 +147,10 @@ function Profile(props) {
   const getBooking = async () => {
     try {
       console.log('get booking jalan');
-      const id = await AsyncStorage.getItem('id');
+      // const id = await AsyncStorage.getItem('id');
       const result = await axios.get(`booking/user/${id}`);
       setBooking(result.data.data);
+      setRefreshing(false);
     } catch (error) {
       console.log(error);
     }
@@ -124,7 +158,12 @@ function Profile(props) {
 
   const handleLogout = async () => {
     try {
-      alert('Logout');
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      await axios.post('auth/logout', {
+        refreshToken: refreshToken,
+      });
+      // setData();
+      setId();
       await AsyncStorage.clear();
       props.navigation.navigate('AuthScreen', {
         screen: 'Login',
@@ -167,7 +206,7 @@ function Profile(props) {
 
   const updateImg = async () => {
     try {
-      const id = await AsyncStorage.getItem('id');
+      // const id = await AsyncStorage.getItem('id');
       console.log(id);
       console.log(imgUser[0]);
       const newImage = new FormData();
@@ -180,7 +219,7 @@ function Profile(props) {
       console.log(result.data.data);
       setImgUser();
       setImage({
-        uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${result.data.data.image}`,
+        uri: CLOUDINARY + result.data.data.image,
       });
     } catch (error) {
       console.log(error.response.data);
@@ -195,9 +234,9 @@ function Profile(props) {
       let tempMovie = {};
       booking.map(async item => {
         try {
-          const id = item.scheduleId;
-          console.log(id);
-          const result = await axios.get(`schedule/${id}`);
+          const idSchedule = item.scheduleId;
+          console.log(idSchedule);
+          const result = await axios.get(`schedule/${idSchedule}`);
           tempMovie = {...tempMovie, [result.data.data[0].movieId]: ''};
           tempSchedule = {
             ...tempSchedule,
@@ -207,6 +246,7 @@ function Profile(props) {
           setSchedule(tempSchedule);
         } catch (error) {
           console.log('get schedule error');
+          this.getSchedule();
           console.log(error.response.data);
         }
       });
@@ -216,21 +256,29 @@ function Profile(props) {
   };
 
   const getMovie = () => {
-    let tempMovie = {};
-    Object.keys(movie).map(async (item, index) => {
-      try {
-        console.log(item);
-        const result = await axios.get(`movie/${item}`);
-        tempMovie = {...tempMovie, [item]: result.data.data[0]};
-        setMovie(tempMovie);
-        // console.log(result.data.data[0]);
-      } catch (error) {
-        console.log('get movie error');
-      }
-    });
+    if (schedule) {
+      let tempMovie = {};
+      Object.keys(movie).map(async (item, index) => {
+        try {
+          console.log(item);
+          const result = await axios.get(`movie/${item}`);
+          tempMovie = {...tempMovie, [item]: result.data.data[0]};
+          setMovie(tempMovie);
+          // console.log(result.data.data[0]);
+        } catch (error) {
+          console.log('get movie error');
+        }
+      });
+    }
   };
 
-  console.log(movie);
+  useEffect(() => {
+    console.log('use effect get schedule jalan 1');
+    if (booking) {
+      console.log('use effect get schedule jalan 2 ');
+      getSchedule();
+    }
+  }, [booking]);
 
   useEffect(() => {
     if (schedule) {
@@ -241,207 +289,241 @@ function Profile(props) {
   }, [schedule]);
 
   useEffect(() => {
-    if (booking) {
-      getUser();
-      getSchedule();
-    } else {
-      console.log('use effect jalan');
+    if (id) {
+      console.log('get user data');
       getUser();
       getBooking();
+      getSchedule();
+      getMovie();
     }
-  }, [booking]);
+  }, [id]);
+
+  useEffect(() => {
+    console.log('get id jalan');
+    getId();
+    getBooking();
+  }, []);
 
   const profileActive = (
-    <View style={styles.container}>
-      <View style={styles.infoContainerTop}>
-        <TouchableOpacity onPress={() => setImgClicked(true)}>
-          <Image
-            source={imgUser ? imgUser : image}
-            style={{
-              borderRadius: 136 / 2,
-              height: 136,
-              width: 136,
-              resizeMode: 'cover',
-              marginTop: 30,
-            }}
-          />
-        </TouchableOpacity>
-        {imgClicked ? (
-          <View>
-            {imgUser ? (
-              <TouchableOpacity
-                onPress={updateImg}
-                style={[
-                  styles.button,
-                  {marginTop: 15, backgroundColor: 'green'},
-                ]}>
-                <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
-                  Save Image
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <></>
-            )}
-            <TouchableOpacity
-              onPress={toggleModal}
-              style={[styles.button, {marginVertical: 10}]}>
-              <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
-                Change Image
-              </Text>
-            </TouchableOpacity>
-            <Modal isVisible={isModalVisible} style={styles.view}>
-              <View
+    <FlatList
+      data={data}
+      renderItem={({item}) => (
+        <View style={styles.container}>
+          <View style={styles.infoContainerTop}>
+            <TouchableOpacity onPress={() => setImgClicked(true)}>
+              <Image
+                source={imgUser ? imgUser : image}
                 style={{
-                  backgroundColor: 'white',
-                  padding: 20,
-                  alignItems: 'center',
-                  borderTopLeftRadius: 16,
-                  borderTopRightRadius: 16,
-                }}>
+                  borderRadius: 136 / 2,
+                  height: 136,
+                  width: 136,
+                  resizeMode: 'cover',
+                  marginTop: 30,
+                }}
+              />
+            </TouchableOpacity>
+            {imgClicked ? (
+              <View>
+                {imgUser ? (
+                  <TouchableOpacity
+                    onPress={updateImg}
+                    style={[
+                      styles.button,
+                      {marginTop: 15, backgroundColor: 'green'},
+                    ]}>
+                    <Text
+                      style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
+                      Save Image
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <></>
+                )}
                 <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleOpenGalery}>
+                  onPress={toggleModal}
+                  style={[styles.button, {marginVertical: 10}]}>
                   <Text
                     style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
-                    Open Galery
+                    Change Image
                   </Text>
                 </TouchableOpacity>
+                <Modal isVisible={isModalVisible} style={styles.view}>
+                  <View
+                    style={{
+                      backgroundColor: 'white',
+                      padding: 20,
+                      alignItems: 'center',
+                      borderTopLeftRadius: 16,
+                      borderTopRightRadius: 16,
+                    }}>
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={handleOpenGalery}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: '600',
+                          color: 'white',
+                        }}>
+                        Open Galery
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.button, {marginVertical: 20}]}
+                      onPress={handleOpenCamera}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: '600',
+                          color: 'white',
+                        }}>
+                        Open Camera
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.button, {backgroundColor: 'red'}]}
+                      onPress={toggleModal}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: '600',
+                          color: 'white',
+                        }}>
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </Modal>
                 <TouchableOpacity
-                  style={[styles.button, {marginVertical: 20}]}
-                  onPress={handleOpenCamera}>
-                  <Text
-                    style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
-                    Open Camera
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, {backgroundColor: 'red'}]}
-                  onPress={toggleModal}>
+                  onPress={() => {
+                    setImgClicked(false);
+                    setImgUser();
+                  }}
+                  style={[
+                    styles.button,
+                    {
+                      marginBottom: 20,
+                      backgroundColor: 'red',
+                    },
+                  ]}>
                   <Text
                     style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
               </View>
-            </Modal>
-            <TouchableOpacity
-              onPress={() => {
-                setImgClicked(false);
-                setImgUser();
-              }}
-              style={[
-                styles.button,
-                {
-                  marginBottom: 20,
-                  backgroundColor: 'red',
-                },
-              ]}>
-              <Text style={{fontSize: 14, fontWeight: '600', color: 'white'}}>
-                Cancel
+            ) : (
+              <></>
+            )}
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '600',
+                color: '#14142B',
+                marginTop: 30,
+              }}>
+              {data ? `${data[0].firstName} ${data[0].lastName}` : ''}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '400',
+                color: '#4E4B66',
+                marginTop: 10,
+                marginBottom: 30,
+              }}>
+              {data ? data[0].noTelp : ''}
+            </Text>
+          </View>
+          <View style={styles.infoContainerBottom}>
+            <TouchableOpacity style={styles.button} onPress={handleLogout}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}>
+                Logout
               </Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <></>
-        )}
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: '600',
-            color: '#14142B',
-            marginTop: 30,
-          }}>
-          {data ? `${data[0].firstName} ${data[0].lastName}` : ''}
-        </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: '400',
-            color: '#4E4B66',
-            marginTop: 10,
-            marginBottom: 30,
-          }}>
-          {data ? data[0].noTelp : ''}
-        </Text>
-      </View>
-      <View style={styles.infoContainerBottom}>
-        <TouchableOpacity style={styles.button} onPress={handleLogout}>
           <Text
             style={{
-              color: 'white',
-              fontSize: 16,
-              fontWeight: '700',
+              color: '#14142B',
+              fontSize: 18,
+              fontWeight: '600',
+              marginVertical: 30,
             }}>
-            Logout
+            Account Settings
           </Text>
-        </TouchableOpacity>
-      </View>
-      <Text
-        style={{
-          color: '#14142B',
-          fontSize: 18,
-          fontWeight: '600',
-          marginVertical: 30,
-        }}>
-        Account Settings
-      </Text>
-      <View style={styles.formContainer}>
-        <Text style={styles.formHeader}>Details Information</Text>
-        <Text style={styles.formTitle}>First Name</Text>
-        <TextInput
-          style={styles.input}
-          value={formInfo.firstName}
-          onChangeText={text => handleDetailInfo(text, 'firstName')}
-        />
-        <Text style={styles.formTitle}>Last Name</Text>
-        <TextInput
-          style={styles.input}
-          value={formInfo.lastName}
-          onChangeText={text => handleDetailInfo(text, 'lastName')}
-        />
-        <Text style={styles.formTitle}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          value={formInfo.noTelp}
-          onChangeText={text => handleDetailInfo(text, 'noTelp')}
-        />
-      </View>
-      <TouchableOpacity style={styles.buttonUpdate} onPress={handleUpdateInfo}>
-        <Text
-          style={{
-            color: 'white',
-            fontSize: 14,
-            fontWeight: '700',
-          }}>
-          Update Changes
-        </Text>
-      </TouchableOpacity>
-      <View style={styles.formContainer}>
-        <Text style={styles.formHeader}>Account and Privacy</Text>
-        <Text style={styles.formTitle}>New Password</Text>
-        <TextInput
-          style={styles.input}
-          value={formPass.newPassword}
-          onChangeText={text => handlePassword(text, 'newPassword')}
-        />
-        <Text style={styles.formTitle}>Confirm</Text>
-        <TextInput
-          style={styles.input}
-          value={formPass.confirmPassword}
-          onChangeText={text => handlePassword(text, 'confirmPassword')}
-        />
-      </View>
-      <TouchableOpacity style={styles.buttonUpdate} onPress={handleUpdatePass}>
-        <Text
-          style={{
-            color: 'white',
-            fontSize: 14,
-            fontWeight: '700',
-          }}>
-          Update Changes
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <View style={styles.formContainer}>
+            <Text style={styles.formHeader}>Details Information</Text>
+            <Text style={styles.formTitle}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              value={formInfo.firstName}
+              onChangeText={text => handleDetailInfo(text, 'firstName')}
+            />
+            <Text style={styles.formTitle}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              value={formInfo.lastName}
+              onChangeText={text => handleDetailInfo(text, 'lastName')}
+            />
+            <Text style={styles.formTitle}>Phone Number</Text>
+            <TextInput
+              style={styles.input}
+              value={formInfo.noTelp}
+              onChangeText={text => handleDetailInfo(text, 'noTelp')}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.buttonUpdate}
+            onPress={handleUpdateInfo}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 14,
+                fontWeight: '700',
+              }}>
+              Update Changes
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.formContainer}>
+            <Text style={styles.formHeader}>Account and Privacy</Text>
+            <Text style={styles.formTitle}>New Password</Text>
+            <TextInput
+              style={styles.input}
+              value={formPass.newPassword}
+              secureTextEntry
+              onChangeText={text => handlePassword(text, 'newPassword')}
+            />
+            <Text style={styles.formTitle}>Confirm</Text>
+            <TextInput
+              secureTextEntry
+              style={styles.input}
+              value={formPass.confirmPassword}
+              onChangeText={text => handlePassword(text, 'confirmPassword')}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.buttonUpdate}
+            onPress={handleUpdatePass}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 14,
+                fontWeight: '700',
+              }}>
+              Update Changes
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    />
   );
 
   const historyActive = (
@@ -530,7 +612,7 @@ function Profile(props) {
   return (
     <SafeAreaView>
       <FlatList
-        data={data}
+        data={['1']}
         renderItem={({item}) => (
           <>
             <View style={styles.header}>
@@ -594,6 +676,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     borderRadius: 12,
+    paddingHorizontal: 10,
   },
   formTitle: {color: '#696F79', fontWeight: '400', fontSize: 14},
   button: {

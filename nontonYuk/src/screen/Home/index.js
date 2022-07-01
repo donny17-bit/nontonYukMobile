@@ -17,6 +17,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {getUserId} from '../../stores/action/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../../components/Footer';
+import {CLOUDINARY} from '@env';
 
 function HomeScreen(props) {
   const user = useSelector(state => state.user);
@@ -145,7 +146,7 @@ function HomeScreen(props) {
               <View style={[styles.imageCard, {backgroundColor: 'white'}]}>
                 <Image
                   source={{
-                    uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${item.image}`,
+                    uri: CLOUDINARY + item.image,
                   }}
                   style={{
                     width: 125,
@@ -234,7 +235,7 @@ function HomeScreen(props) {
               <View style={styles.imageCard}>
                 <Image
                   source={{
-                    uri: `https://res.cloudinary.com/dusoicuhh/image/upload/v1652761552/${item.image}`,
+                    uri: CLOUDINARY + item.image,
                   }}
                   style={{
                     width: 125,

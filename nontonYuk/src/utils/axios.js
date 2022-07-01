@@ -1,8 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {URL} from '@env';
 
 const axiosApiInstances = axios.create({
-  baseURL: 'https://project-nontonyuk.herokuapp.com/',
+  baseURL: URL,
 });
 
 // Add a request interceptor
